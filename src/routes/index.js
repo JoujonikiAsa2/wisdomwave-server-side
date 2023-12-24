@@ -1,9 +1,11 @@
-const { courses } = require('../controller/courseController')
+const { courses, categories } = require('../controller/courseController')
 
 const router = require('express').Router()
 
-
+// Course Router
 router.get('/courses',courses)
-// router.post('/logout',logout)
+
+// Unique category router
+router.get('/categories',categories)
 
 module.exports = router

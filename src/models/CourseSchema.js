@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+
+// Course Model Schema
 const CourseSchema = mongoose.Schema(
     {
         thumbnail: { type: String, required: true },
@@ -8,6 +10,7 @@ const CourseSchema = mongoose.Schema(
         limitOfStudents: { type: Number, required: true },
         credit: { type: String, required: true },
         enrollFee: { type: String, required: true },
+        category: { type: String, required: true },
         whatYouWillLearn: { type: [String], required: true },
         courseDescription: { type: String, required: true },
         outcome: { type: String, required: true },
