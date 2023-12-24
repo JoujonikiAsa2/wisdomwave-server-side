@@ -11,7 +11,7 @@ exports.courses = async (req, res) => {
   }
 };
 
-// 
+// fetch unique category value from the database
 exports.categories = async (req, res) => {
   try {
     const categories = await CourseModel.distinct('courseDetails.category').sort();
