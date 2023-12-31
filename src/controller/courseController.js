@@ -22,3 +22,20 @@ exports.categories = async (req, res) => {
     res.status(500).json({ status: "Failed to fetch", data: error.message });
   }
 };
+
+// fetch individual data by id from the course database
+exports.courseDetails = async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const course = await CourseModel.findById(courseId);
+    console.log("User want to get course by Id")
+    if (!course) {
+      return res.status(404).json({ status: "Failed", message: "Course not found" });
+    }
+
+    res.status(200).json({ status: "success", data: course });
+  } catch (error) {
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
+  }
+};
+
