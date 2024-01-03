@@ -7,7 +7,7 @@ exports.courses = async (req, res) => {
     const result = await CourseModel.find();
     res.status(200).json({ status: "success", data: result });
   } catch (e) {
-    res.status(200).json({ status: "fail", data: e });
+    res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
@@ -19,7 +19,7 @@ exports.categories = async (req, res) => {
     res.status(200).json({ status: "success", data: categories });
   } catch (error) {
     // console.error('Error finding', error);
-    res.status(500).json({ status: "Failed to fetch", data: error.message });
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
   }
 };
 

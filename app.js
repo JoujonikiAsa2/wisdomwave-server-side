@@ -4,8 +4,11 @@ const applyMiddlewares = require("./src/middlewares/applyMiddlewares");
 const globalErrorHandler = require("./src/utils/globalErrorHandler");
 const connectDB = require("./src/db/connectDB");
 const router = require("./src/routes");
+var bodyParser = require("body-parser");
 require("dotenv").config();
 const port = 5000
+
+app.use(bodyParser.json({limit: '100000kb'}));
 
 // import the middlewares
 applyMiddlewares(app)
