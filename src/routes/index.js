@@ -1,5 +1,6 @@
-const { blogs, blog, BlogPost, BlogsRead, BlogReadById } = require('../controller/blogController')
+const { BlogPost, BlogsRead, BlogReadById } = require('../controller/blogController')
 const { courses, categories, courseDetails } = require('../controller/courseController')
+const { PaymentMethod } = require('../controller/paymentController')
 
 const router = require('express').Router()
 
@@ -20,5 +21,10 @@ router.get('/blogs',BlogsRead)
 
 // individual blog by id
 router.get('/blogs/:id',BlogReadById)
+
+// individual blog by id
+router.post('/create-payment-intent',PaymentMethod)
+
+
 
 module.exports = router

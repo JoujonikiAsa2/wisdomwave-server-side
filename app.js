@@ -5,6 +5,7 @@ const globalErrorHandler = require("./src/utils/globalErrorHandler");
 const connectDB = require("./src/db/connectDB");
 const router = require("./src/routes");
 var bodyParser = require("body-parser");
+
 require("dotenv").config();
 const port = 5000
 
