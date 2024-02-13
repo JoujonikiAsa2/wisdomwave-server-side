@@ -1,13 +1,19 @@
 const { BlogPost, BlogsRead, BlogReadById } = require('../controller/blogController')
-const { courses, categories, courseDetails } = require('../controller/courseController')
+const { courses, categories, courseDetails, totalCourse, totalCategory } = require('../controller/courseController')
 const { PaymentMethod } = require('../controller/paymentController')
 
 const router = require('express').Router()
 
-// Course Router
+// Course api
 router.get('/courses',courses)
 
-// Unique category router
+// toalcourse api
+router.get('/totalCourse',totalCourse)
+
+// toalcategory api
+router.get('/totalCategory',totalCategory)
+
+// Unique category api
 router.get('/categories',categories)
 
 // individual course from courses database
