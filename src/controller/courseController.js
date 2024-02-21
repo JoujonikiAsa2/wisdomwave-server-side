@@ -5,9 +5,9 @@ const CourseModel = require("../models/CourseSchema");
 exports.totalCategory = async (req, res) => {
   try {
     const categories = await CourseModel.distinct('courseDetails.category').sort();
-    res.status(200).json({ status: "success", data: categories.length});
-  } catch (e) {
-    res.status(500).json({ status: "fail", message: e.message });
+    res.status(200).json({ status: "success", data: categories.length });
+  } catch (error ) {
+    res.status(500).json({ status: "fail", message: error.message });
   }
 };
 // total course
@@ -15,8 +15,8 @@ exports.totalCourse = async (req, res) => {
   try {
     const result = await CourseModel.estimatedDocumentCount();
     res.status(200).json({ status: "success", data: result });
-  } catch (e) {
-    res.status(500).json({ status: "fail", message: e.message });
+  } catch (error) {
+    res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
@@ -25,8 +25,8 @@ exports.courses = async (req, res) => {
   try {
     const result = await CourseModel.find();
     res.status(200).json({ status: "success", data: result });
-  } catch (e) {
-    res.status(500).json({ status: "fail", message: e.message });
+  } catch (error) {
+    res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
@@ -38,7 +38,21 @@ exports.categories = async (req, res) => {
     res.status(200).json({ status: "success", data: categories });
   } catch (error) {
     // console.error('Error finding', error);
-    res.status(500).json({ status: "Failed to fetch", message: e.message });
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
+  }
+};
+
+// fetch unique category value from the database
+exports.searchedCategories = async (req, res) => {
+  try {
+    const category = req.params.category.toLowerCase()
+    console.log(category)
+    const searchedCategories = await CourseModel.find({'courseDetails.category': category});
+    // console.log('Categories:', categories);
+    res.status(200).json({ status: "success", data: searchedCategories });
+  } catch (error) {
+    // console.error('Error finding', error);
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
   }
 };
 
@@ -54,7 +68,8 @@ exports.courseDetails = async (req, res) => {
 
     res.status(200).json({ status: "success", data: course });
   } catch (error) {
-    res.status(500).json({ status: "Failed to fetch", message: e.message });
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
   }
 };
+
 

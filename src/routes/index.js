@@ -1,4 +1,4 @@
-const { courses, categories, courseDetails, totalCourse, totalCategory } = require('../controller/courseController')
+const { courses, categories, courseDetails, totalCourse, totalCategory, searchedCategories } = require('../controller/courseController')
 const { DiscussionPost, ReplyPost, DiscussionsRead, DiscussionReadById } = require('../controller/discussionController')
 const { PaymentMethod } = require('../controller/paymentController')
 
@@ -18,6 +18,9 @@ router.get('/categories',categories)
 
 // individual course from courses database
 router.get('/courses/:id',courseDetails)
+
+//searchedCourse by course title
+router.get('/searchedCategory/:category', searchedCategories)
 
 // All discussions post api
 router.post('/discussions',DiscussionPost)
