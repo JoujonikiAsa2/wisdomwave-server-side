@@ -1,5 +1,5 @@
-const { BlogPost, BlogsRead, BlogReadById } = require('../controller/blogController')
 const { courses, categories, courseDetails, totalCourse, totalCategory } = require('../controller/courseController')
+const { DiscussionPost, ReplyPost, DiscussionsRead, DiscussionReadById } = require('../controller/discussionController')
 const { PaymentMethod } = require('../controller/paymentController')
 
 const router = require('express').Router()
@@ -19,14 +19,17 @@ router.get('/categories',categories)
 // individual course from courses database
 router.get('/courses/:id',courseDetails)
 
-// All blogs
-router.post('/blogs',BlogPost)
+// All discussions post api
+router.post('/discussions',DiscussionPost)
 
-// All blogs
-router.get('/blogs',BlogsRead)
+//reply post api
+router.post('/discussions/:id',ReplyPost)
+
+// All discussions get api
+router.get('/discussions',DiscussionsRead)
 
 // individual blog by id
-router.get('/blogs/:id',BlogReadById)
+router.get('/discussions/:id',DiscussionReadById)
 
 // individual blog by id
 router.post('/create-payment-intent',PaymentMethod)
