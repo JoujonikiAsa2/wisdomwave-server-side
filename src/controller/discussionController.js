@@ -36,6 +36,7 @@ exports.DiscussionReadById = async (req, res) => {
 // post reply api
 exports.ReplyPost = async (req, res) => {
     try {
+        // console.log("You hit on like api")
         const id = req.params.id;
         const response = req.body;
         // console.log(response)

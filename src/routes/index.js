@@ -1,6 +1,8 @@
+const { Likes } = require('../controller/LikesController')
+const { Payment, PaymentSuccess, PaymentCancel, PaymentFail, Home } = require('../controller/PaymentController')
+const { PurchasedCourses } = require('../controller/PurchasedCoursesController')
 const { courses, categories, courseDetails, totalCourse, totalCategory, searchedCategories } = require('../controller/courseController')
-const { DiscussionPost, ReplyPost, DiscussionsRead, DiscussionReadById } = require('../controller/discussionController')
-const { PaymentMethod } = require('../controller/paymentController')
+const { DiscussionPost, ReplyPost, DiscussionsRead, DiscussionReadById, DiscussionLikes } = require('../controller/discussionController')
 
 const router = require('express').Router()
 
@@ -31,12 +33,28 @@ router.post('/discussions/:id',ReplyPost)
 // All discussions get api
 router.get('/discussions',DiscussionsRead)
 
-// individual blog by id
+// individual discussion by id
 router.get('/discussions/:id',DiscussionReadById)
 
-// individual blog by id
-router.post('/create-payment-intent',PaymentMethod)
+// individual discussion by id and update likes
+router.get('/discussions/likes/user',Likes)
 
+// Payment post api
+router.post('/payment/:id', Payment)
 
+//payment success post api
+router.post('/payment/success/:tran_Id', PaymentSuccess)
+
+//payment cancel api
+router.post('/payment/cancel', PaymentCancel)
+
+//payment failed api
+router.post('/payment/fail', PaymentFail)
+
+//purchased course api
+router.get('/purchasedCourses/:email', PurchasedCourses)
+
+//homepage
+router.get('/home', Home)
 
 module.exports = router

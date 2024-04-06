@@ -30,7 +30,8 @@ const CourseContentSchema = new mongoose.Schema({
       },
       category: String,
       classStart: Date,
-      subtitle: String
+      subtitle: String,
+      playlistId: String
     }
   });
   

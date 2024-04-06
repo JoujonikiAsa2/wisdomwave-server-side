@@ -10,6 +10,7 @@ const DiscussionSchema = new mongoose.Schema({
     email: String,
     comments: [Object],
     replies: [Object],
+    likes: Number
 })
 
 const DiscussionModel = mongoose.model('discussion', DiscussionSchema)
