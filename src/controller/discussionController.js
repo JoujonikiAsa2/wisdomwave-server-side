@@ -1,7 +1,7 @@
 const DiscussionModel = require("../models/DiscussionSchema");
 
 // create a discussion post
-exports.DiscussionPost = async (req, res) => {
+exports.discussionPost = async (req, res) => {
     try {
         const discussion = req.body
         const result = await DiscussionModel.create(discussion)
@@ -12,7 +12,7 @@ exports.DiscussionPost = async (req, res) => {
 }
 
 // read all discussions
-exports.DiscussionsRead = async (req, res) => {
+exports.discussionsRead = async (req, res) => {
     try {
         const result = await DiscussionModel.find({}, '-__v');
         res.status(200).json({ status: "success", data: result });
@@ -22,7 +22,7 @@ exports.DiscussionsRead = async (req, res) => {
 }
 
 // read a discussion by id
-exports.DiscussionReadById = async (req, res) => {
+exports.discussionReadById = async (req, res) => {
     try {
         const id = req.params.id
         const query = { _id: id }
@@ -34,7 +34,7 @@ exports.DiscussionReadById = async (req, res) => {
 }
 
 // post reply api
-exports.ReplyPost = async (req, res) => {
+exports.replyPost = async (req, res) => {
     try {
         // console.log("You hit on like api")
         const id = req.params.id;

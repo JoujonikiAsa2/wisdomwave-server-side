@@ -1,6 +1,6 @@
 const PurchasedCourseModel = require("../models/PurchasedCourseSchema")
 
-exports.PurchasedCourses = async (req, res) => {
+exports.purchasedCourses = async (req, res) => {
     try {
         const email = req.params.email
         const query = {userEmail: email}

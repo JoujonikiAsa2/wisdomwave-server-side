@@ -1,6 +1,6 @@
 const LikesModel = require("../models/LikesSchema")
 
-exports.Likes = async (req, res) => {
+exports.likes = async (req, res) => {
     try {
         console.log("You hit on like api of likes");
         const userId = req.body;

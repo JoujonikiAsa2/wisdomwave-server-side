@@ -8,20 +8,30 @@ const store_id = process.env.STORE_ID;
 const store_passwd = process.env.STORE_PASSWORD;
 const is_live = false; //true for live, false for sandbox
 
-exports.Payment = async (req, res) => {
+exports.payment = async (req, res) => {
     try {
         const courseId = req.params.id;
         const course = await CourseModel.findById(courseId);
         const courseFee = course.courseDetails.enrollFee;
-        const tran_Id = new mongoose.mongo.ObjectId().toString();
+        const tran_Id = new mongoose.Types.ObjectId().toString(); // Using mongoose.Types.ObjectId() instead of mongoose.mongo.ObjectId()
+        const userEmail = req.body.userEmail;
+        console.log("Course Id", courseId   );
+        
+        // Construct the success URL with query parameters
+        const successUrl = `https://wisdomwave-server-side.vercel.app/api/payment/success/${courseId}?email=${userEmail}`;
+        // const successUrl = `http://localhost:5000/api/payment/success/${courseId}?email=${userEmail}`;
+
         const data = {
             total_amount: courseFee,
             currency: 'BDT',
-            tran_id: tran_Id, // use unique tran_id for each api call
-            success_url: `http://localhost:5000/api/payment/success/${tran_Id}`,
-            fail_url: `http://localhost:5000/api/payment/fail/${tran_Id}`,
-            cancel_url: `http://localhost:5000/api/payment/cancel/${tran_Id}`,
-            ipn_url: 'http://localhost:5000/ipn',
+            tran_id: tran_Id,
+            success_url: successUrl, // Use the constructed success URL
+            fail_url: `https://wisdomwave-server-side.vercel.app/api/payment/fail/${courseId}`,
+            cancel_url: `https://wisdomwave-server-side.vercel.app/api/payment/cancel/${courseId}`,
+            ipn_url: 'https://wisdomwave-server-side.vercel.app/ipn',
+            // fail_url: `http://localhost:5000/api/payment/fail/${courseId}`,
+            // cancel_url: `http://localhost:5000/api/payment/cancel/${courseId}`,
+            // ipn_url: 'http://localhost:5000/ipn',
             shipping_method: 'Courier',
             product_name: 'Computer.',
             product_category: 'Electronic',
@@ -49,35 +59,18 @@ exports.Payment = async (req, res) => {
         const apiResponse = await sslcz.init(data);
 
         // Create the purchase record in the database
-        const purchase = {
-            userEmail: req.body.userEmail,
-            courseTitle: course.courseDetails.title,
-            courseFee: course.courseDetails.enrollFee,
-            transactionId: tran_Id,
-            paidStatus: req.body.paidStatus,
-        }
-
-        const purchasedCourseObject = {
-            userEmail: req.body.userEmail,
-            courseId: req.params.id,
-            transactionId: tran_Id,
-            paidStatus: false,
-            courseDetails: { ...course.courseDetails }
-        }
-        // Create the purchase record in the database
-
-        const purchasedCourse = await PurchasedCourseModel.findOne({ courseId: courseId })
-        const email = await PurchasedCourseModel.findOne({ userEmail: req.body.userEmail })
+        const purchasedCourse = await PurchasedCourseModel.findOne({ courseId: courseId });
+        const email = await PurchasedCourseModel.findOne({ userEmail: req.body.userEmail });
+        
         if (purchasedCourse && email) {
-            console.log("All ready enrolled")
-            res.send({ url: "http://localhost:5000/api/home" });
+            console.log("Already enrolled");
+            // res.send({ url: "http://localhost:5000/api/home" });
+            res.send({ url: "https://wisdomwave-server-side.vercel.app/api/home" });
         }
         else {
-            const paymentResult = await PaymentModel.create(purchase);
-            const purchasedResult = await PurchasedCourseModel.create(purchasedCourseObject)
             // Redirect the user to payment gateway
             const GatewayPageURL = apiResponse.GatewayPageURL;
-            res.send({ url: GatewayPageURL});
+            res.send({ url: GatewayPageURL });
             console.log('URL:', GatewayPageURL);
         }
     } catch (error) {
@@ -87,30 +80,57 @@ exports.Payment = async (req, res) => {
 };
 
 
+exports.paymentSuccess = async (req, res) => {
+    try {
+        const course_Id = req.params.courseId;
+        const course = await CourseModel.findById(course_Id);
+        const tran_Id = new mongoose.Types.ObjectId().toString();
+        console.log(course_Id, tran_Id);
+        
+        // Create the purchase record in the database
+        const purchase = {
+            userEmail: req.query.email,
+            courseTitle: course.courseDetails.title,
+            courseFee: course.courseDetails.enrollFee,
+            transactionId: tran_Id,
+            paidStatus: true,
+        };
 
-exports.PaymentSuccess = async (req, res) => {
-    const tran_Id = req.params.tran_Id
-    console.log(tran_Id)
-    const find = { transactionId: tran_Id }
-    const update = { paidStatus: true }
-    const payment = await PaymentModel.findOneAndUpdate(find, update)
-    const purchasedcourse = await PurchasedCourseModel.findOneAndUpdate(find, update)
-    res.redirect(`http://localhost:5173/payment/success/${tran_Id}`)
+        const purchasedCourseObject = {
+            userEmail: req.query.email, // Fix here, should use req.query.email instead of req.body.userEmail
+            courseId: req.params.courseId, // Fix here, should use req.params.id instead of req.params.courseId
+            transactionId: tran_Id,
+            paidStatus: true,
+            courseDetails: { ...course.courseDetails }
+        };
+
+        console.log(req.query);
+
+        const paymentResult = await PaymentModel.create(purchase);
+        const purchasedResult = await PurchasedCourseModel.create(purchasedCourseObject);
+        res.redirect(`https://wisdomwave-project.netlify.app/payment/success/${course_Id}`);
+        // res.redirect(`http://localhost:5173/payment/success/${course_Id}`);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+};
+
+
+exports.paymentCancel = async (req, res) => {
+    console.log(course_Id)
+    // res.redirect(`http://localhost:5173/payment/cancel/${course_Id}`)
+    res.redirect(`https://wisdomwave-project.netlify.app/payment/cancel/${course_Id}`)
 }
 
-exports.PaymentCancel = async (req, res) => {
-    const tran_Id = req.params.tran_Id
-    const payment =  await PaymentModel.deleteOne({tranId: tran_Id})
-    console.log(tran_Id)
-    res.redirect(`http://localhost:5173/payment/cancel/${tran_Id}`)
+exports.paymentFail = async (req, res) => {
+    const course_Id = req.params.courseId
+    console.log(course_Id)
+    // res.redirect(`http://localhost:5173/payment/fail/${course_Id}`)
+    res.redirect(`https://wisdomwave-project.netlify.app/payment/fail/${course_Id}`)
 }
 
-exports.PaymentFail = async (req, res) => {
-    const tran_Id = req.params.tran_Id
-    console.log(tran_Id)
-    res.redirect(`http://localhost:5173/payment/fail/${tran_Id}`)
-}
-
-exports.Home = async (req, res) => {
-    res.redirect(`http://localhost:5173`)
+exports.home = async (req, res) => {
+    // res.redirect(`http://localhost:5173`)
+    res.redirect(`https://wisdomwave-project.netlify.app`)
 }
