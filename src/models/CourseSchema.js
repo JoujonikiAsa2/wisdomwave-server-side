@@ -9,11 +9,12 @@ const CourseContentSchema = new mongoose.Schema({
   const CourseSchema = new mongoose.Schema({
     courseDetails: {
       thumbnail: String,
+      instructorEmail: String,
       title: String,
       instructor: String,
       rating: Number,
       totalStudents: Number,
-      creditHour: String,
+      duration: Number,
       enrollFee: String,
       whatYouWillLearn: [String],
       courseDescription: String,

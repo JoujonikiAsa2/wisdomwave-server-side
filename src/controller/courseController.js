@@ -6,7 +6,7 @@ exports.totalCategory = async (req, res) => {
   try {
     const categories = await CourseModel.distinct('courseDetails.category').sort();
     res.status(200).json({ status: "success", data: categories.length });
-  } catch (error ) {
+  } catch (error) {
     res.status(500).json({ status: "fail", message: error.message });
   }
 };
@@ -47,7 +47,7 @@ exports.searchedCategories = async (req, res) => {
   try {
     const category = req.params.category.toLowerCase()
     console.log(category)
-    const searchedCategories = await CourseModel.find({'courseDetails.category': category});
+    const searchedCategories = await CourseModel.find({ 'courseDetails.category': category });
     // console.log('Categories:', categories);
     res.status(200).json({ status: "success", data: searchedCategories });
   } catch (error) {
@@ -64,7 +64,7 @@ exports.searchCourses = async (req, res) => {
     const splitedKeywords = searchValue.split(" ");
 
     // Construct an array of regex
-    const regexQueries = splitedKeywords.map(keyword => new RegExp(keyword,'i'));
+    const regexQueries = splitedKeywords.map(keyword => new RegExp(keyword, 'i'));
 
     // Search for courses where each keyword matches part of the title
     const searchedCourses = await CourseModel.find({
@@ -83,7 +83,23 @@ exports.courseDetails = async (req, res) => {
   try {
     const courseId = req.params.id;
     const course = await CourseModel.findById(courseId);
-    console.log("User want to get course by Id")
+    // console.log("User want to get course by Id")
+    if (!course) {
+      return res.status(404).json({ status: "Failed", message: "Course not found" });
+    }
+
+    res.status(200).json({ status: "success", data: course });
+  } catch (error) {
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
+  }
+};
+// get course by instructorEmail
+exports.createdCourse = async (req, res) => {
+  try {
+    const email = req.params.instructorEmail;
+    const filter = { 'courseDetails.instructorEmail': email }
+    const course = await CourseModel.find(filter);
+    // console.log("User want to get course by Id")
     if (!course) {
       return res.status(404).json({ status: "Failed", message: "Course not found" });
     }
@@ -94,4 +110,22 @@ exports.courseDetails = async (req, res) => {
   }
 };
 
+//  find by email first and if email match then delete the course
+exports.deleteCourse = async (req, res) => {
+  try {
+    console.log('hitted delete')
+    const email = req.params.instructorEmail;
+    const filter = { 'courseDetails.instructorEmail': email }
+    const course = await CourseModel.find(filter);
+    if (course) {
+      const id = req.params.id
+      const filteredId = { _id: id }
+      const result = await CourseModel.deleteOne(filteredId);
+      // console.log(result)
+      res.status(200).json({ status: "success", data: course });
+    }
+  } catch (error) {
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
+  }
+}
 

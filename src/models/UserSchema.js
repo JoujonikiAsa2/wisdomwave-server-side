@@ -10,7 +10,9 @@ const UserSchema = new mongoose.Schema({
     linkedin: String,
     userType: String,
     phoneNumber: String,
-    verified: Boolean
+    verified: Boolean,
+    location: String,
+    age: String
 });
 
 const UserModel = mongoose.model('users', UserSchema);

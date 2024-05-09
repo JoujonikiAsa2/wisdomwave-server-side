@@ -16,7 +16,7 @@ applyMiddlewares(app)
 
 
 // Check if the server is running  
-app.get('/health', (req, res) => {
+app.get('/', (req, res) => {
     res.send('Wisdomwave is running.........')
 })
 

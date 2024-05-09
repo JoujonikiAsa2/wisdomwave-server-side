@@ -1,6 +1,6 @@
 const { payment, paymentSuccess, paymentFail, paymentCancel, home } = require('../controller/paymentController')
 const { tuitions, tutors, tutorDetails, messageTutor, requestedTuition } = require('../controller/tutorsController')
-const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses } = require('../controller/courseController')
+const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, createdCourse, deleteCourse } = require('../controller/courseController')
 const { discussionPost, replyPost, discussionsRead, discussionReadById } = require('../controller/discussionController')
 const { likes } = require('../controller/likesController')
 const { purchasedCourses } = require('../controller/purchasedCoursesController')
@@ -25,6 +25,12 @@ router.get('/categories',categories)
 
 // individual course from courses database
 router.get('/courses/:id',courseDetails)
+
+// individual course from courses database
+router.get('/courses/email/:instructorEmail',createdCourse)
+
+// delete course from courses database by 
+router.delete('/courses/id/:id/email/:instructorEmail',deleteCourse)
 
 //searchedCourse by course category
 router.get('/searchedCategory/:category', searchedCategories)
@@ -75,6 +81,7 @@ router.get('/home', home)
 
 // tutors
 //-----------------------------------------------------------------------------------
+
 // tuitions api
 router.get('/tuitions', tuitions)
 
@@ -97,7 +104,7 @@ router.get('/requestedTuition/:email', requestedTuition)
 // create student api
 router.post('/users', createUser)
 
-// update student api
+// update student info api
 router.put('/user/:email', updateUser)
 
 // read student api

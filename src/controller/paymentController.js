@@ -18,20 +18,20 @@ exports.payment = async (req, res) => {
         console.log("Course Id", courseId   );
         
         // Construct the success URL with query parameters
-        const successUrl = `https://wisdomwave-server-side.vercel.app/api/payment/success/${courseId}?email=${userEmail}`;
-        // const successUrl = `http://localhost:5000/api/payment/success/${courseId}?email=${userEmail}`;
+        // const successUrl = `https://wisdomwave-server-side.vercel.app/api/payment/success/${courseId}?email=${userEmail}`;
+        const successUrl = `http://localhost:5000/api/payment/success/${courseId}?email=${userEmail}`;
 
         const data = {
             total_amount: courseFee,
             currency: 'BDT',
             tran_id: tran_Id,
             success_url: successUrl, // Use the constructed success URL
-            fail_url: `https://wisdomwave-server-side.vercel.app/api/payment/fail/${courseId}`,
-            cancel_url: `https://wisdomwave-server-side.vercel.app/api/payment/cancel/${courseId}`,
-            ipn_url: 'https://wisdomwave-server-side.vercel.app/ipn',
-            // fail_url: `http://localhost:5000/api/payment/fail/${courseId}`,
-            // cancel_url: `http://localhost:5000/api/payment/cancel/${courseId}`,
-            // ipn_url: 'http://localhost:5000/ipn',
+            // fail_url: `https://wisdomwave-server-side.vercel.app/api/payment/fail/${courseId}`,
+            // cancel_url: `https://wisdomwave-server-side.vercel.app/api/payment/cancel/${courseId}`,
+            // ipn_url: 'https://wisdomwave-server-side.vercel.app/ipn',
+            fail_url: `http://localhost:5000/api/payment/fail/${courseId}`,
+            cancel_url: `http://localhost:5000/api/payment/cancel/${courseId}`,
+            ipn_url: 'http://localhost:5000/ipn',
             shipping_method: 'Courier',
             product_name: 'Computer.',
             product_category: 'Electronic',
@@ -64,8 +64,8 @@ exports.payment = async (req, res) => {
         
         if (purchasedCourse && email) {
             console.log("Already enrolled");
-            // res.send({ url: "http://localhost:5000/api/home" });
-            res.send({ url: "https://wisdomwave-server-side.vercel.app/api/home" });
+            res.send({ url: "http://localhost:5000/api/home" });
+            // res.send({ url: "https://wisdomwave-server-side.vercel.app/api/home" });
         }
         else {
             // Redirect the user to payment gateway
@@ -108,8 +108,8 @@ exports.paymentSuccess = async (req, res) => {
 
         const paymentResult = await PaymentModel.create(purchase);
         const purchasedResult = await PurchasedCourseModel.create(purchasedCourseObject);
-        res.redirect(`https://wisdomwave-project.netlify.app/payment/success/${course_Id}`);
-        // res.redirect(`http://localhost:5173/payment/success/${course_Id}`);
+        // res.redirect(`https://wisdomwave-project.netlify.app/payment/success/${course_Id}`);
+        res.redirect(`http://localhost:5173/payment/success/${course_Id}`);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send({ error: 'Internal Server Error' });
@@ -119,18 +119,18 @@ exports.paymentSuccess = async (req, res) => {
 
 exports.paymentCancel = async (req, res) => {
     console.log(course_Id)
-    // res.redirect(`http://localhost:5173/payment/cancel/${course_Id}`)
-    res.redirect(`https://wisdomwave-project.netlify.app/payment/cancel/${course_Id}`)
+    res.redirect(`http://localhost:5173/payment/cancel/${course_Id}`)
+    // res.redirect(`https://wisdomwave-project.netlify.app/payment/cancel/${course_Id}`)
 }
 
 exports.paymentFail = async (req, res) => {
     const course_Id = req.params.courseId
     console.log(course_Id)
-    // res.redirect(`http://localhost:5173/payment/fail/${course_Id}`)
-    res.redirect(`https://wisdomwave-project.netlify.app/payment/fail/${course_Id}`)
+    res.redirect(`http://localhost:5173/payment/fail/${course_Id}`)
+    // res.redirect(`https://wisdomwave-project.netlify.app/payment/fail/${course_Id}`)
 }
 
 exports.home = async (req, res) => {
-    // res.redirect(`http://localhost:5173`)
-    res.redirect(`https://wisdomwave-project.netlify.app`)
+    res.redirect(`http://localhost:5173`)
+    // res.redirect(`https://wisdomwave-project.netlify.app`)
 }
