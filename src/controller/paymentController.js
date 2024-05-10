@@ -15,8 +15,8 @@ exports.payment = async (req, res) => {
         const courseFee = course.courseDetails.enrollFee;
         const tran_Id = new mongoose.Types.ObjectId().toString(); // Using mongoose.Types.ObjectId() instead of mongoose.mongo.ObjectId()
         const userEmail = req.body.userEmail;
-        console.log("Course Id", courseId   );
-        
+        console.log("Course Id", courseId);
+
         // Construct the success URL with query parameters
         // const successUrl = `https://wisdomwave-server-side.vercel.app/api/payment/success/${courseId}?email=${userEmail}`;
         const successUrl = `http://localhost:5000/api/payment/success/${courseId}?email=${userEmail}`;
@@ -61,7 +61,7 @@ exports.payment = async (req, res) => {
         // Create the purchase record in the database
         const purchasedCourse = await PurchasedCourseModel.findOne({ courseId: courseId });
         const email = await PurchasedCourseModel.findOne({ userEmail: req.body.userEmail });
-        
+
         if (purchasedCourse && email) {
             console.log("Already enrolled");
             res.send({ url: "http://localhost:5000/api/home" });
@@ -86,7 +86,7 @@ exports.paymentSuccess = async (req, res) => {
         const course = await CourseModel.findById(course_Id);
         const tran_Id = new mongoose.Types.ObjectId().toString();
         console.log(course_Id, tran_Id);
-        
+
         // Create the purchase record in the database
         const purchase = {
             userEmail: req.query.email,
@@ -109,6 +109,7 @@ exports.paymentSuccess = async (req, res) => {
         const paymentResult = await PaymentModel.create(purchase);
         const purchasedResult = await PurchasedCourseModel.create(purchasedCourseObject);
         // res.redirect(`https://wisdomwave-project.netlify.app/payment/success/${course_Id}`);
+        res.status(200).send({ message: 'Payment successful' });
         res.redirect(`http://localhost:5173/payment/success/${course_Id}`);
     } catch (error) {
         console.error('Error:', error);
@@ -118,19 +119,74 @@ exports.paymentSuccess = async (req, res) => {
 
 
 exports.paymentCancel = async (req, res) => {
-    console.log(course_Id)
-    res.redirect(`http://localhost:5173/payment/cancel/${course_Id}`)
-    // res.redirect(`https://wisdomwave-project.netlify.app/payment/cancel/${course_Id}`)
+    try {
+        const course_Id = req.params.courseId
+        console.log(course_Id)
+        res.status(200).send({ message: 'Payment canceled' });
+        res.redirect(`http://localhost:5173/payment/cancel/${course_Id}`)
+        // res.redirect(`https://wisdomwave-project.netlify.app/payment/cancel/${course_Id}`)
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
 }
 
 exports.paymentFail = async (req, res) => {
-    const course_Id = req.params.courseId
-    console.log(course_Id)
-    res.redirect(`http://localhost:5173/payment/fail/${course_Id}`)
-    // res.redirect(`https://wisdomwave-project.netlify.app/payment/fail/${course_Id}`)
+    try {
+        const course_Id = req.params.courseId
+        console.log(course_Id)
+        res.status(200).send({ message: 'Payment failed' });
+        res.redirect(`http://localhost:5173/payment/fail/${course_Id}`)
+        // res.redirect(`https://wisdomwave-project.netlify.app/payment/fail/${course_Id}`)
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
 }
 
 exports.home = async (req, res) => {
-    res.redirect(`http://localhost:5173`)
-    // res.redirect(`https://wisdomwave-project.netlify.app`)
+    try {
+        res.status(200).send({ message: 'Home page' });
+        res.redirect(`http://localhost:5173`)
+        // res.redirect(`https://wisdomwave-project.netlify.app`)
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+}
+
+exports.payments = async (req, res) => {
+    // find payment by instructor email from purchasedModel
+    try {
+        const email = req.params.email
+        // search by courseDetails.instructorEmail
+        const result = await PurchasedCourseModel.find({ 'courseDetails.instructorEmail': email })
+        res.status(200).json({ status: "success", data: result })
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message })
+    }
+}
+
+// count total earning by calculate courseDetails.price and search by courseDetails.instructorEmail
+
+// search by courseDetails.instructorEmail
+// aggregate method is used to perform complex query on the database
+// aggregate method will take array of pipeline operator and return the result of the pipeline
+// pipeline operator are used to specify the stage of the aggregation pipeline
+// in this case we are using $match and $group stage
+// $match will filter the document based on the condition
+// $group will group the document based on the _id and calculate the totalEarning
+
+exports.totalEarning = async (req, res) => {
+    try {
+        const email = req.params.email
+        // search by courseDetails.instructorEmail
+        const result = await PurchasedCourseModel.aggregate([
+            { $match: { 'courseDetails.instructorEmail': email } },
+            { $group: { _id: null, totalEarning: { $sum: '$courseDetails.enrollFee' } } }
+        ])
+        res.status(200).json({ status: "success", data: result })
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message })
+    }
 }

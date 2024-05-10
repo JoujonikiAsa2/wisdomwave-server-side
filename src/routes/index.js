@@ -1,10 +1,13 @@
-const { payment, paymentSuccess, paymentFail, paymentCancel, home } = require('../controller/paymentController')
+const { payment, paymentSuccess, paymentFail, paymentCancel, home, totalEarning } = require('../controller/paymentController')
 const { tuitions, tutors, tutorDetails, messageTutor, requestedTuition } = require('../controller/tutorsController')
-const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, createdCourse, deleteCourse } = require('../controller/courseController')
+const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, deleteCourse, findCourseByEmail, updateCourse, createCourse } = require('../controller/courseController')
 const { discussionPost, replyPost, discussionsRead, discussionReadById } = require('../controller/discussionController')
 const { likes } = require('../controller/likesController')
 const { purchasedCourses } = require('../controller/purchasedCoursesController')
 const { createUser, readUser, readUserByEmail, updateUser } = require('../controller/userController')
+const { createAnnouncement, deleteAnnouncement, announcements } = require('../controller/AnnouncementController')
+const { createLiveClass } = require('../controller/LiveClassController')
+const { enrolledStudents, totalStudents } = require('../controller/InstructorController')
 
 const router = require('express').Router()
 
@@ -13,6 +16,7 @@ const router = require('express').Router()
 //---------------------------------------------------------------------------
 // Course api
 router.get('/courses',courses)
+
 
 // toalcourse api
 router.get('/totalCourse',totalCourse)
@@ -25,12 +29,6 @@ router.get('/categories',categories)
 
 // individual course from courses database
 router.get('/courses/:id',courseDetails)
-
-// individual course from courses database
-router.get('/courses/email/:instructorEmail',createdCourse)
-
-// delete course from courses database by 
-router.delete('/courses/id/:id/email/:instructorEmail',deleteCourse)
 
 //searchedCourse by course category
 router.get('/searchedCategory/:category', searchedCategories)
@@ -78,11 +76,58 @@ router.get('/purchasedCourses/:email', purchasedCourses)
 //homepage
 router.get('/home', home)
 
+// instructor
+// -------------------------------------------------------------------------------------
+
+
+// Course api
+router.post('/courses',createCourse)
+
+// individual course from courses database
+router.get('/courses/email/:instructorEmail',findCourseByEmail)
+
+// delete course from courses database by 
+router.delete('/courses/id/:id/email/:instructorEmail',deleteCourse)
+
+// update course info after searching by id
+router.put('/courses/:id', updateCourse)
+
+// create announcement api
+router.post('/announcements', createAnnouncement)
+
+// delete announcement api
+router.delete('/announcement/:id', deleteAnnouncement)
+
+// find announcement by email
+router.get('/announcements/email/:email', announcements)
+
+// find quiz by email
+router.get('/quizs/:email', announcements)
+
+// create quiz api
+router.post('/quizs', createAnnouncement)
+
+// live class link update api
+router.put('/liveClasses/id/:id', createLiveClass)
+
+// live class link update api
+router.put('/totalEarning/:email', totalEarning)
+
+// live class link update api
+router.get('/totalEarning/:email', totalEarning)
+
+// enrolled students
+router.get('/enrolledStudents/instructor/:instructorEmail', enrolledStudents)
+
+// Total Student counter
+router.get('/totalStudents/instructor/email/:instructorEmail', totalStudents)
+
+
 
 // tutors
 //-----------------------------------------------------------------------------------
 
-// tuitions api
+// tuitor api
 router.get('/tuitions', tuitions)
 
 // tutors api

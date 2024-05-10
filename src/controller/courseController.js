@@ -93,8 +93,9 @@ exports.courseDetails = async (req, res) => {
     res.status(500).json({ status: "Failed to fetch", message: error.message });
   }
 };
+
 // get course by instructorEmail
-exports.createdCourse = async (req, res) => {
+exports.findCourseByEmail = async (req, res) => {
   try {
     const email = req.params.instructorEmail;
     const filter = { 'courseDetails.instructorEmail': email }
@@ -110,6 +111,22 @@ exports.createdCourse = async (req, res) => {
   }
 };
 
+// Create course
+exports.createCourse = async (req, res) => {
+  try {
+    const courseInfo = req.body
+    const isExist = await CourseModel.findOne({ 'courseDetails.instructorEmail': courseInfo.courseDetails.instructorEmail })
+    if (isExist) {
+      return res.status(404).json({ status: "Failed", message: "Course already exist" });
+    }
+    else {
+      const course = await CourseModel.create(courseInfo);
+      res.status(200).json({ status: "success", data: course });
+    }
+  } catch (error) {
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
+  }
+}
 //  find by email first and if email match then delete the course
 exports.deleteCourse = async (req, res) => {
   try {
@@ -124,6 +141,19 @@ exports.deleteCourse = async (req, res) => {
       // console.log(result)
       res.status(200).json({ status: "success", data: course });
     }
+  } catch (error) {
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
+  }
+}
+
+// update course api
+exports.updateCourse = async (req, res) => {
+  try {
+    const id = req.params.id
+    const update = req.body
+    const options = { new: true };
+    const course = await CourseModel.findByIdAndUpdate(id, update, options)
+    res.status(200).json({ status: "success", data: course });
   } catch (error) {
     res.status(500).json({ status: "Failed to fetch", message: error.message });
   }

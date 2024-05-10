@@ -1,23 +1,39 @@
 const mongoose = require("mongoose");
 
 // Course Model Schema
-const CourseContentSchema = new mongoose.Schema({
-    title: String,
-    content: String
-});
+const CourseContentSchema = new mongoose.Schema(
+    {
+        title: String,
+        content: String
+    }
+);
+
+const liveClassesSchema = new mongoose.Schema(
+    {
+        date: String,
+        Title: String,
+        instructorEmail: String,
+        link: String
+    }
+)
 
 const PurchasedCourseSchema = new mongoose.Schema({
+    userName: String,
     userEmail: String,
     courseId: String,
     paidStatus: Boolean,
     transactionId: String,
+    liveClasses: [liveClassesSchema],
     courseDetails: {
         thumbnail: String,
+        instructorEmail: String,
         title: String,
         instructor: String,
         rating: Number,
         totalStudents: Number,
-        creditHour: String,
+        totalVideo: Number,
+        totalLiveClasses: Number,
+        duration: Number,
         enrollFee: String,
         whatYouWillLearn: [String],
         courseDescription: String,
