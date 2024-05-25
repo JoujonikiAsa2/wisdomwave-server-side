@@ -13,10 +13,10 @@ exports.readQuiz = async (req, res) => {
 }
 
 // create quiz by find email and quiz title
-exports.createQuiz = async (req, res) => {
+exports.quizResponse = async (req, res) => {
     try {
         const quiz = req.body
-        const filter = { 'email': quiz.email, 'quizTitle': quiz.quizTitle }
+        const filter = { 'studentEmail': quiz.studentEmail, 'instructorEmail': quiz.instructorEmail }
         const isExist = await QuizModel.findOne({ filter })
         if (isExist) {
             return res.status(404).json({ status: "Failed", message: "Quiz already exist" });

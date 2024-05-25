@@ -11,9 +11,10 @@ const CourseContentSchema = new mongoose.Schema(
 const liveClassesSchema = new mongoose.Schema(
     {
         date: String,
-        Title: String,
+        title: String,
         instructorEmail: String,
-        link: String
+        link: String,
+        assignmentLink: String
     }
 )
 

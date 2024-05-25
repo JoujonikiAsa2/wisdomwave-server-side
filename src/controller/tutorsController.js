@@ -3,31 +3,26 @@ const TutorMessageModel = require("../models/TutorMessageSchema");
 const TutorProfileModel = require("../models/TutorProfileSchema");
 const nodemailer = require('nodemailer')
 
-// all tuitons api
+exports.createProfile = async (req, res) => {
+    try {
+        const email = req.params.userEmail
+        const tutorProfile = req.body
+        const isExist = await TutorProfileModel.findOne({ 'email': email })
+        if (isExist) {
+            res.status(400).json({ status: "fail", message: "Tuition already exist" })
+        }
+        else {
+            const result = await TutorProfileModel.create(tutorProfile)
+        res.status(200).json({ status: "success", data: result })
+        }
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message })
+    }
+}
+
 exports.tuitions = async (req, res) => {
     try {
         const result = await TuitionModel.find({}, '-__v');
-        res.status(200).json({ status: "success", data: result });
-    } catch (error) {
-        res.status(500).json({ status: "fail", message: error.message });
-    }
-}
-
-// create tuiton api
-exports.createTuitions = async (req, res) => {
-    try {
-        const tuition = req.body
-        const result = await TuitionModel.create(tuition);
-        res.status(200).json({ status: "success", data: result });
-    } catch (error) {
-        res.status(500).json({ status: "fail", message: error.message });
-    }
-}
-
-// all tutors api
-exports.tutors = async (req, res) => {
-    try {
-        const result = await TutorProfileModel.find({}, '-__v');
         res.status(200).json({ status: "success", data: result });
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });
@@ -48,65 +43,11 @@ exports.tutorDetails = async (req, res) => {
     }
 }
 
-exports.messageTutor = async (req, res) => {
-    const { name, phone, email, message, userEmail, type, responseStatus } = req.body;
-
-    var myemail = process.env.SENDER_EMAIL;
-    var mypassword = process.env.APPLICATION_PASSWORD;
-
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: myemail,
-            pass: mypassword,
-        },
-    });
-
-    // async function to send email
-    async function sendEmail() {
-        try {
-            const info = await transporter.sendMail({
-                from: `WisdomWave "<${email}>"`,
-                to: `${email}`,
-                subject: "Tuition request from WisdomWave",
-                // text: ,
-                html: `
-<pre>
-You got a tuition request from <b>${name}</b>
-<strong>Message from student: </strong><i>${message}</i>
-<b>Contact Info:</b>
-    Name: ${name}
-    Phone: ${phone}
-    Email: ${userEmail}
-</pre>  
-    
-                `,
-            });
-
-            console.log("Message sent: %s", info.messageId);
-            const messageState = {
-                name: name,
-                phoneNumber: phone,
-                email: userEmail,
-                tutionType: type,
-                tutorEmail: email,
-                responseStatus: responseStatus,
-            }
-            const response = TutorMessageModel.create(messageState)
-            res.status(200).send({ status: "success", data: "Message Send Successfuly!" });
-        } catch (error) {
-            console.error("Error occurred:", error);
-            res.status(500).send({ status: "fail", message: error.message });
-        }
-    }
-
-    sendEmail();
-};
 
 // all requested tuitions
-exports.requestedTuition = async (req, res) => {
+exports.requestedTuitionByTutorEmail = async (req, res) => {
     try {
-        const email = req.params.email
+        const email = req.params.tutorEmail
         const filter = {email: email}
         const result = await TutorMessageModel.find(filter);
         res.status(200).send({ status: "success", data: result });
@@ -116,4 +57,18 @@ exports.requestedTuition = async (req, res) => {
         res.status(500).send({ status: "fail", message: error.message });
     }
 
+}
+
+// update the responseStatus into responsed by seraching email, tutorEmail
+
+exports.updateResponse = async (req, res) => {
+    try {
+        const tutorEmail = req.params.tutorEmail
+        const email = req.params.email
+        const filter = { 'email': email, 'tutorEmail': tutorEmail }
+        const result = await TutorMessageModel.updateOne(filter, { $set: { responseStatus: 'responed' } });
+        res.status(200).send({ status: "success", data: result });
+    } catch (error) {
+        res.status(500).send({ status: "fail", message: error.message });
+    }
 }

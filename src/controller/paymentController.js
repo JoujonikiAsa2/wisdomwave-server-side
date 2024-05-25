@@ -2,7 +2,7 @@ const SSLCommerzPayment = require('sslcommerz-lts');
 const CourseModel = require('../models/CourseSchema');
 const mongoose = require('mongoose');
 const PaymentModel = require('../models/PaymentSchema');
-const PurchasedCourseModel = require('../models/PurchasedCourseSchema');
+const PurchasedCourseModel = require('../models/PurchasedCourseSchema')
 
 const store_id = process.env.STORE_ID;
 const store_passwd = process.env.STORE_PASSWORD;
@@ -85,7 +85,8 @@ exports.paymentSuccess = async (req, res) => {
         const course_Id = req.params.courseId;
         const course = await CourseModel.findById(course_Id);
         const tran_Id = new mongoose.Types.ObjectId().toString();
-        console.log(course_Id, tran_Id);
+        const students = parseInt(course.courseDetails.totalStudents )
+        // console.log(course_Id, tran_Id);
 
         // Create the purchase record in the database
         const purchase = {
@@ -104,25 +105,39 @@ exports.paymentSuccess = async (req, res) => {
             courseDetails: { ...course.courseDetails }
         };
 
-        console.log(req.query);
+        // update student count at student model database by comparing course id
+        const updateStudent = await CourseModel.findOneAndUpdate({ _id: req.params.courseId }, {$inc: { totalStudents: students+ 1 }}, { new: true });
 
-        const paymentResult = await PaymentModel.create(purchase);
-        const purchasedResult = await PurchasedCourseModel.create(purchasedCourseObject);
+
+        const isExist =  await PurchasedCourseModel.findOne({ 'userEmail': req.query.email });
+
+        if (isExist) {
+            console.log("Already enrolled");
+            res.redirect("http://localhost:5000/api/home");
+            // res.send({ url: "https://wisdomwave-server-side.vercel.app/api/home" });
+        }
+        else {
+            const paymentResult = await PaymentModel.create(purchase);
+            const result = await PurchasedCourseModel.create(purchasedCourseObject);
+            // console.log(result);
+            res.redirect(`http://localhost:5173/payment/success/${course_Id}`);
+        }
+        
         // res.redirect(`https://wisdomwave-project.netlify.app/payment/success/${course_Id}`);
-        res.status(200).send({ message: 'Payment successful' });
-        res.redirect(`http://localhost:5173/payment/success/${course_Id}`);
+        // res.status(200).send({ message: 'Payment successful' });
+
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send({ error: 'Internal Server Error' });
     }
 };
 
-
+ 
 exports.paymentCancel = async (req, res) => {
     try {
         const course_Id = req.params.courseId
         console.log(course_Id)
-        res.status(200).send({ message: 'Payment canceled' });
+        // res.status(200).send({ message: 'Payment canceled' });
         res.redirect(`http://localhost:5173/payment/cancel/${course_Id}`)
         // res.redirect(`https://wisdomwave-project.netlify.app/payment/cancel/${course_Id}`)
     } catch (error) {
@@ -135,7 +150,7 @@ exports.paymentFail = async (req, res) => {
     try {
         const course_Id = req.params.courseId
         console.log(course_Id)
-        res.status(200).send({ message: 'Payment failed' });
+        // res.status(200).send({ message: 'Payment failed' });
         res.redirect(`http://localhost:5173/payment/fail/${course_Id}`)
         // res.redirect(`https://wisdomwave-project.netlify.app/payment/fail/${course_Id}`)
     } catch (error) {
@@ -146,7 +161,7 @@ exports.paymentFail = async (req, res) => {
 
 exports.home = async (req, res) => {
     try {
-        res.status(200).send({ message: 'Home page' });
+        // res.status(200).send({ message: 'Home page' });
         res.redirect(`http://localhost:5173`)
         // res.redirect(`https://wisdomwave-project.netlify.app`)
     } catch (error) {
@@ -182,10 +197,27 @@ exports.totalEarning = async (req, res) => {
         const email = req.params.email
         // search by courseDetails.instructorEmail
         const result = await PurchasedCourseModel.aggregate([
-            { $match: { 'courseDetails.instructorEmail': email } },
-            { $group: { _id: null, totalEarning: { $sum: '$courseDetails.enrollFee' } } }
-        ])
-        res.status(200).json({ status: "success", data: result })
+            // Match documents where enrollFee is not null
+            {
+              $match: {
+                "courseDetails.enrollFee": { $exists: true, $ne: null }
+              }
+            },
+            // Project only the necessary fields to optimize performance
+            {
+              $project: {
+                _id: 0,
+                enrollFee: "$courseDetails.enrollFee"
+              }
+            },
+            // Group by null to calculate the sum across all documents
+            {
+              $group: {
+                _id: null,
+                totalEnrollFee: { $sum: { $toDouble: "$enrollFee" } }
+              }
+            }])
+        res.status(200).json([... result] )
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message })
     }

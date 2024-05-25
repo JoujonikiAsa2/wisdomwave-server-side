@@ -1,21 +1,22 @@
 const mongoose = require("mongoose");
 
-// Tutor Profile Schema
+// Tuition Schema
 const DetailsSchema = new mongoose.Schema({
   Class: String,
   Subject: String
 });
 
 const TuitionSchema = new mongoose.Schema({
-  TuitionCode: String,
-  Location: String,
-  SubLocation: String,
-  Medium: String,
-  Category: String,
-  Address: String,
-  TutoringDays: [String],
-  Salary: String,
-  Details: DetailsSchema
+  userEmail: String,
+  tuitionCode: String,
+  location: String,
+  subLocation: String,
+  medium: String,
+  category: String,
+  address: String,
+  tutoringDays: [String],
+  salary: String,
+  details: DetailsSchema
 });
 
 const TuitionModel = mongoose.model("tuitions", TuitionSchema);

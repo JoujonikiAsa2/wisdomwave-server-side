@@ -1,13 +1,16 @@
 const { payment, paymentSuccess, paymentFail, paymentCancel, home, totalEarning } = require('../controller/paymentController')
-const { tuitions, tutors, tutorDetails, messageTutor, requestedTuition } = require('../controller/tutorsController')
+const { tutorDetails, createProfile, tuitions, requestedTuitionByTutorEmail } = require('../controller/tutorsController')
 const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, deleteCourse, findCourseByEmail, updateCourse, createCourse } = require('../controller/courseController')
-const { discussionPost, replyPost, discussionsRead, discussionReadById } = require('../controller/discussionController')
+const { discussionPost, replyPost, discussionsRead, discussionReadById, deleteDiscussion } = require('../controller/discussionController')
 const { likes } = require('../controller/likesController')
 const { purchasedCourses } = require('../controller/purchasedCoursesController')
 const { createUser, readUser, readUserByEmail, updateUser } = require('../controller/userController')
-const { createAnnouncement, deleteAnnouncement, announcements } = require('../controller/AnnouncementController')
+const { createAnnouncement, deleteAnnouncement, announcements, StudentAnnouncements, readStatusUpdate, isReadStatus } = require('../controller/AnnouncementController')
 const { createLiveClass } = require('../controller/LiveClassController')
-const { enrolledStudents, totalStudents } = require('../controller/InstructorController')
+const { enrolledStudents, totalStudents, coursebyId } = require('../controller/InstructorController')
+const { createTuitions, tuitionsByEmail, tutors, requestedTuition, messageTutor } = require('../controller/StudentController')
+const { createAssaignment, assignments } = require('../controller/AssignmentController')
+const { quizResponse } = require('../controller/QuizController')
 
 const router = require('express').Router()
 
@@ -15,20 +18,20 @@ const router = require('express').Router()
 // courses
 //---------------------------------------------------------------------------
 // Course api
-router.get('/courses',courses)
+router.get('/courses', courses)
 
 
 // toalcourse api
-router.get('/totalCourse',totalCourse)
+router.get('/totalCourse', totalCourse)
 
 // toalcategory api
-router.get('/totalCategory',totalCategory)
+router.get('/totalCategory', totalCategory)
 
 // Unique category api
-router.get('/categories',categories)
+router.get('/categories', categories)
 
 // individual course from courses database
-router.get('/courses/:id',courseDetails)
+router.get('/courses/:id', courseDetails)
 
 //searchedCourse by course category
 router.get('/searchedCategory/:category', searchedCategories)
@@ -37,22 +40,26 @@ router.get('/searchedCategory/:category', searchedCategories)
 router.get('/search/key/:searchValue', searchCourses)
 
 
+
 // discussions
 // ------------------------------------------------------------------------------------------
 // All discussions post api
-router.post('/discussions',discussionPost)
+router.post('/discussions', discussionPost)
 
 //reply post api
-router.post('/discussions/:id',replyPost)
+router.post('/discussions/:id', replyPost)
 
 // All discussions get api
-router.get('/discussions',discussionsRead)
+router.get('/discussions', discussionsRead)
 
 // individual discussion by id
-router.get('/discussions/:id',discussionReadById)
+router.get('/discussions/:id', discussionReadById)
+
+// individual discussion by id
+router.delete('/discussions/:id/:email', deleteDiscussion)
 
 // individual discussion by id and update likes
-router.get('/discussions/likes/user',likes)
+router.get('/discussions/likes/user', likes)
 
 
 
@@ -81,16 +88,20 @@ router.get('/home', home)
 
 
 // Course api
-router.post('/courses',createCourse)
+router.post('/courses', createCourse)
+
+// // individual course from courses database
+router.get('/instructorUpdateCourses/:id', coursebyId)
+
 
 // individual course from courses database
-router.get('/courses/email/:instructorEmail',findCourseByEmail)
+router.get('/courses/email/:instructorEmail', findCourseByEmail)
 
 // delete course from courses database by 
-router.delete('/courses/id/:id/email/:instructorEmail',deleteCourse)
+router.delete('/courses/id/:id/email/:instructorEmail', deleteCourse)
 
 // update course info after searching by id
-router.put('/courses/:id', updateCourse)
+router.patch('/courses/:id', updateCourse)
 
 // create announcement api
 router.post('/announcements', createAnnouncement)
@@ -98,20 +109,30 @@ router.post('/announcements', createAnnouncement)
 // delete announcement api
 router.delete('/announcement/:id', deleteAnnouncement)
 
+// find announcement student eamil
+router.get('/announcements/:email', StudentAnnouncements)
+
+// find announcement student eamil
+router.patch('/announcements/:email', readStatusUpdate)
+
+// find announcement email and satatus
+router.post('/announcements/isRead', isReadStatus)
+// find announcement email and satatus
+router.get('/announcements/isRead/email/:email', isReadStatus)
+
 // find announcement by email
 router.get('/announcements/email/:email', announcements)
-
-// find quiz by email
-router.get('/quizs/:email', announcements)
-
-// create quiz api
-router.post('/quizs', createAnnouncement)
 
 // live class link update api
 router.put('/liveClasses/id/:id', createLiveClass)
 
-// live class link update api
-router.put('/totalEarning/:email', totalEarning)
+// create assignmentTask
+router.post('/assignments', createAssaignment)
+// create quiz response
+router.post('/quiz', quizResponse)
+
+// read assignmentTask
+router.get('/assignments/:id/:title', assignments)
 
 // live class link update api
 router.get('/totalEarning/:email', totalEarning)
@@ -124,14 +145,26 @@ router.get('/totalStudents/instructor/email/:instructorEmail', totalStudents)
 
 
 
+
 // tutors
 //-----------------------------------------------------------------------------------
 
-// tuitor api
+// create tutor api
+router.post('/tutors', createProfile)
+
+// allTuition request
+router.get('/requestedTuition/tutor/:tutorEmail', requestedTuitionByTutorEmail)
+
+// tuitions api
 router.get('/tuitions', tuitions)
 
-// tutors api
-router.get('/tutors', tutors)
+// update tution requeststatus
+router.put('/requestedTuition/:tutorEmail', requestedTuition)
+
+
+
+// student
+// -----------------------------------------------------------------------------------
 
 // specific tutor api
 router.get('/tutor/:id', tutorDetails)
@@ -139,12 +172,22 @@ router.get('/tutor/:id', tutorDetails)
 // cantact tutor api
 router.post('/messages', messageTutor)
 
-// allTuition request
+// all tutors api
+router.get('/tutors', tutors)
+
+// tuitions api
+router.get('/tuitions/:userEmail', tuitionsByEmail)
+
+// create tuitions api
+router.post('/tuitions', createTuitions)
+
+// allTuition request by email
 router.get('/requestedTuition/:email', requestedTuition)
 
 
-// student
-// -----------------------------------------------------------------------------------
+
+// user's api
+// ---------------------------------------------------------------------------
 
 // create student api
 router.post('/users', createUser)
@@ -157,5 +200,6 @@ router.get('/users', readUser)
 
 // read student by email api
 router.get('/user/:email', readUserByEmail)
+
 
 module.exports = router

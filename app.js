@@ -9,7 +9,7 @@ var bodyParser = require("body-parser");
 require("dotenv").config();
 const port = 5000
 
-app.use(bodyParser.json({limit: '100000kb'}));
+app.use(bodyParser.json({ limit: '100000kb' }));
 
 // import the middlewares
 applyMiddlewares(app)
@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
 
 // Routing Implement
 app.use("/api", router);
+
 
 // handle error for all method 
 app.all("*", (req, res, next) => {
@@ -39,10 +40,12 @@ const main = async () => {
         app.listen(port, () => {
             console.log(`WisdomWave Server is running on port ${port}`);
         });
+
     } catch (err) {
         console.log(err);
     }
 }
+
 
 main()
 module.exports = app;

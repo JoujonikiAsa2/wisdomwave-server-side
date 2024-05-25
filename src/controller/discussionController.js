@@ -27,6 +27,7 @@ exports.discussionReadById = async (req, res) => {
         const id = req.params.id
         const query = { _id: id }
         const result = await DiscussionModel.findOne(query);
+        // console.log(result.data)
         res.status(200).json({ status: "success", data: result });
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });
@@ -71,6 +72,25 @@ exports.replyPost = async (req, res) => {
                 }
             );
             res.status(200).json({ status: "success", data: result });
+        }
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+}
+
+exports.deleteDiscussion = async (req, res) => {
+    try {
+        const id = req.params.id
+        const email = req.params.email
+        console.log("Dit on the delete discussion api")
+        const find = await DiscussionModel.findById(id)
+        // console.log(find)
+        if(find.email === email){
+            const result = await DiscussionModel.findByIdAndDelete(id)
+            return res.status(200).json({ status: "success", data: result });
+        }
+        else{
+            res.status(200).json({ status: "fail", data: "Not Authorized" });
         }
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });

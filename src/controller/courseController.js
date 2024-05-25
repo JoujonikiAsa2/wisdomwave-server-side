@@ -46,7 +46,7 @@ exports.categories = async (req, res) => {
 exports.searchedCategories = async (req, res) => {
   try {
     const category = req.params.category.toLowerCase()
-    console.log(category)
+    // console.log(category)
     const searchedCategories = await CourseModel.find({ 'courseDetails.category': category });
     // console.log('Categories:', categories);
     res.status(200).json({ status: "success", data: searchedCategories });
@@ -114,13 +114,19 @@ exports.findCourseByEmail = async (req, res) => {
 // Create course
 exports.createCourse = async (req, res) => {
   try {
+    console.log("user hit to create course")
     const courseInfo = req.body
-    const isExist = await CourseModel.findOne({ 'courseDetails.instructorEmail': courseInfo.courseDetails.instructorEmail })
+    // console.log(courseInfo.courseDetails.title)
+    const isExist = await CourseModel.findOne({ 'courseDetails.title': courseInfo.courseDetails.title, 'courseDetails.instructorEmail': courseInfo.courseDetails.instructorEmail });
+    
     if (isExist) {
+      console.log("Course already exist")
       return res.status(404).json({ status: "Failed", message: "Course already exist" });
     }
     else {
+      console.log("Course not exist")
       const course = await CourseModel.create(courseInfo);
+      // console.log(course)
       res.status(200).json({ status: "success", data: course });
     }
   } catch (error) {
@@ -149,13 +155,16 @@ exports.deleteCourse = async (req, res) => {
 // update course api
 exports.updateCourse = async (req, res) => {
   try {
-    const id = req.params.id
-    const update = req.body
-    const options = { new: true };
-    const course = await CourseModel.findByIdAndUpdate(id, update, options)
+    const id = req.params.id;
+    const update = req.body; 
+    const options = { new: false };
+    const course = await CourseModel.findByIdAndUpdate(id, update, options); 
+    console.log("course");
     res.status(200).json({ status: "success", data: course });
   } catch (error) {
-    res.status(500).json({ status: "Failed to fetch", message: error.message });
+    res.status(500).json({ status: "Failed to update", message: error.message });
   }
-}
+};
+
+
 
