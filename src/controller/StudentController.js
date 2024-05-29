@@ -43,7 +43,8 @@ exports.createTuitions = async (req, res) => {
 exports.requestedTuition = async (req, res) => {
     try {
         const email = req.params.email
-        const filter = {email: email}
+        const filter = {studentEmail: email}
+        console.log("You are hitting at requestedTuition")
         const result = await TutorMessageModel.find(filter);
         res.status(200).send({ status: "success", data: result });
 
@@ -93,8 +94,9 @@ You got a tuition request from <b>${name}</b>
             const messageState = {
                 name: name,
                 phoneNumber: phone,
-                email: userEmail,
+                studentEmail: userEmail,
                 tutionType: type,
+                message:message,
                 tutorEmail: email,
                 responseStatus: responseStatus,
             }

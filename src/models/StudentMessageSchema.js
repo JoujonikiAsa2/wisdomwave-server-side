@@ -1,18 +1,18 @@
 const mongoose = require("mongoose");
 
 // Define TutorMessage schema
-const TutorMessageSchema = new mongoose.Schema({
+const StudentMessageSchema = new mongoose.Schema({
     name: String,
     phoneNumber: String,
     studentEmail: String,
     tutionType: String,
     tutorEmail: String,
-    message: String,
+    message:String,
     responseStatus: String
 });
 
 // Create TutorMessage model
-const TutorMessageModel = mongoose.model('TutorMessage', TutorMessageSchema);
+const StudentMessageModel = mongoose.model('StudentMessage', StudentMessageSchema);
 
-module.exports = TutorMessageModel;
+module.exports = StudentMessageModel;
 

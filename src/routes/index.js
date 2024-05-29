@@ -1,5 +1,5 @@
 const { payment, paymentSuccess, paymentFail, paymentCancel, home, totalEarning } = require('../controller/paymentController')
-const { tutorDetails, createProfile, tuitions, requestedTuitionByTutorEmail } = require('../controller/tutorsController')
+const { tutorDetails, createProfile, tuitions, requestedTuitionByTutorEmail, messageStudent, getTuitionRequestFromTutor } = require('../controller/tutorsController')
 const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, deleteCourse, findCourseByEmail, updateCourse, createCourse } = require('../controller/courseController')
 const { discussionPost, replyPost, discussionsRead, discussionReadById, deleteDiscussion } = require('../controller/discussionController')
 const { likes } = require('../controller/likesController')
@@ -13,7 +13,8 @@ const { createAssaignment, assignments } = require('../controller/AssignmentCont
 const { quizResponse, readQuiz } = require('../controller/QuizController')
 const { tuitionCreate } = require('../controller/TuitionController')
 const { readDistricts, readDistrictByName } = require('../controller/DistrictController')
-const { readUpazilasByDistrictId } = require('../controller/UpazilaController')
+const { readUpazilasByDistrictId, readUpazilas } = require('../controller/UpazilaController')
+const { institutes, eduLevels, subjects } = require('../controller/EduBgController')
 
 const router = require('express').Router()
 
@@ -171,6 +172,10 @@ router.get('/tuitions', tuitions)
 // update tution requeststatus
 router.put('/requestedTuition/:tutorEmail', requestedTuition)
 
+// send message to student api
+router.post('/student/messages', messageStudent)
+
+
 
 
 // student
@@ -194,6 +199,8 @@ router.post('/tuitions', createTuitions)
 // allTuition request by email
 router.get('/requestedTuition/:email', requestedTuition)
 
+// read request from tutor api
+router.get('/student/tuitionRequest/:email', getTuitionRequestFromTutor)
 
 
 // user's api
@@ -211,7 +218,8 @@ router.get('/users', readUser)
 // read student by email api
 router.get('/user/:email', readUserByEmail)
 
-// districts
+
+// others
 // -----------------------------------------------------------------------
 
 // read district value
@@ -220,7 +228,19 @@ router.get('/districts', readDistricts)
 // read district by name
 router.get('/districts/:name', readDistrictByName)
 
+// read upazilas
+router.get('/upazilas', readUpazilas)
+
 // read upazila by district_id
 router.get('/upazilas/:id', readUpazilasByDistrictId)
+
+// get institutes name
+router.get('/institutes', institutes)
+
+// get subjects name
+router.get('/subjects', subjects)
+
+// get education levels
+router.get('/educationLevels', eduLevels)
 
 module.exports = router

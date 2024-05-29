@@ -1,3 +1,4 @@
+const StudentMessageModel = require("../models/StudentMessageSchema");
 const TuitionModel = require("../models/TuitionSchema");
 const TutorMessageModel = require("../models/TutorMessageSchema");
 const TutorProfileModel = require("../models/TutorProfileSchema");
@@ -47,8 +48,9 @@ exports.tutorDetails = async (req, res) => {
 // all requested tuitions
 exports.requestedTuitionByTutorEmail = async (req, res) => {
     try {
+        console.log("Hello")
         const email = req.params.tutorEmail
-        const filter = {email: email}
+        const filter = {tutorEmail: email}
         const result = await TutorMessageModel.find(filter);
         res.status(200).send({ status: "success", data: result });
 
@@ -72,3 +74,74 @@ exports.updateResponse = async (req, res) => {
         res.status(500).send({ status: "fail", message: error.message });
     }
 }
+
+exports.messageStudent = async (req, res) => {
+    const { name, phone, studentEmail, message, userEmail, type, responseStatus } = req.body;
+
+    var myemail = process.env.SENDER_EMAIL;
+    var mypassword = process.env.APPLICATION_PASSWORD;
+
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: myemail,
+            pass: mypassword,
+        },
+    });
+
+    // async function to send email
+    async function sendEmail() {
+        try {
+            const info = await transporter.sendMail({
+                from: `WisdomWave "<${studentEmail}>"`,
+                to: `${studentEmail}`,
+                subject: "Tuition post response from WisdomWave",
+                // text: ,
+                html: `
+<pre>
+You got a tuition post response from <b>${name}</b>
+<strong>Message from student: </strong><i>${message}</i>
+<b>Contact Info:</b>
+    Name: ${name}
+    Phone: ${phone}
+    Email: ${userEmail}
+</pre>  
+    
+                `,
+            });
+
+            console.log("Message sent: %s", info.messageId);
+            const messageState = {
+                name: name,
+                phoneNumber: phone,
+                studentEmail: studentEmail,
+                tutorEmail: userEmail,
+                message: message,
+                responseStatus: responseStatus,
+            }
+            const response = StudentMessageModel.create(messageState)
+            res.status(200).send({ status: "success", data: "Message Send Successfuly!" });
+        } catch (error) {
+            console.error("Error occurred:", error);
+            res.status(500).send({ status: "fail", message: error.message });
+        }
+    }
+
+    sendEmail();
+};
+
+// get tuition request from tuttion post
+exports.getTuitionRequestFromTutor = async (req, res) => {
+
+    try {
+        const email = req.params.email
+        const filter = { studentEmail: email }
+        const result = await StudentMessageModel.find(filter);
+        res.status(200).send({ status: "success", data: result });
+    } catch (error) {
+        res.status(500).send({ status: "fail", message: error.message });
+    }
+
+}
+ 
+

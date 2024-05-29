@@ -19,3 +19,4 @@ exports.tuitionCreate = async (req, res) => {
         return res.status(500).send({ status: "fail", message: error.message });
     }
 };
+
