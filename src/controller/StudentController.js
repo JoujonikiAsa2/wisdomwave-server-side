@@ -2,6 +2,7 @@
 const TutorMessageModel = require("../models/TutorMessageSchema")
 const TutorProfileModel = require("../models/TutorProfileSchema")
 const TuitionModel = require("../models/TuitionSchema")
+const nodemailer = require('nodemailer');
 
 // search tutions by email
 exports.tuitionsByEmail = async (req, res) => {

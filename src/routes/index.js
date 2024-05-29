@@ -10,7 +10,10 @@ const { createLiveClass } = require('../controller/LiveClassController')
 const { enrolledStudents, totalStudents, coursebyId } = require('../controller/InstructorController')
 const { createTuitions, tuitionsByEmail, tutors, requestedTuition, messageTutor } = require('../controller/StudentController')
 const { createAssaignment, assignments } = require('../controller/AssignmentController')
-const { quizResponse } = require('../controller/QuizController')
+const { quizResponse, readQuiz } = require('../controller/QuizController')
+const { tuitionCreate } = require('../controller/TuitionController')
+const { readDistricts, readDistrictByName } = require('../controller/DistrictController')
+const { readUpazilasByDistrictId } = require('../controller/UpazilaController')
 
 const router = require('express').Router()
 
@@ -60,6 +63,9 @@ router.delete('/discussions/:id/:email', deleteDiscussion)
 
 // individual discussion by id and update likes
 router.get('/discussions/likes/user', likes)
+
+// create tuition
+router.post('/tuitions', tuitionCreate)
 
 
 
@@ -128,6 +134,10 @@ router.put('/liveClasses/id/:id', createLiveClass)
 
 // create assignmentTask
 router.post('/assignments', createAssaignment)
+
+// read quiz response
+router.get('/quiz/:email/:patternTitle', readQuiz)
+
 // create quiz response
 router.post('/quiz', quizResponse)
 
@@ -201,5 +211,16 @@ router.get('/users', readUser)
 // read student by email api
 router.get('/user/:email', readUserByEmail)
 
+// districts
+// -----------------------------------------------------------------------
+
+// read district value
+router.get('/districts', readDistricts)
+
+// read district by name
+router.get('/districts/:name', readDistrictByName)
+
+// read upazila by district_id
+router.get('/upazilas/:id', readUpazilasByDistrictId)
 
 module.exports = router

@@ -3,14 +3,16 @@ const QuizModel = require("../models/QuizSchema")
 // find quiz by email 
 exports.readQuiz = async (req, res) => {
     try {
-        const email = req.params.email
-        const filter = { 'email': email }
-        const result = await QuizModel.find(filter)
-        res.status(200).json({ status: "success", data: result })
+        const email = req.params.email;
+        const quizTitle = req.params.patternTitle; // Make sure this matches your URL parameters
+        const filter = { studentEmail: email, quizTitle: quizTitle }; // Ensure these match your database schema
+
+        const result = await QuizModel.findOne(filter);
+        res.status(200).json({ status: "success", data: result });
     } catch (error) {
-        res.status(500).json({ status: "fail", message: error.message })
+        res.status(500).json({ status: "fail", message: error.message });
     }
-}
+};
 
 // create quiz by find email and quiz title
 exports.quizResponse = async (req, res) => {

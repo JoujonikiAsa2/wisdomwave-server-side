@@ -2,18 +2,17 @@ const mongoose = require("mongoose");
 
 // Tuition Schema
 const DetailsSchema = new mongoose.Schema({
-  Class: String,
-  Subject: String
+  class: String,
+  subjects: [String]
 });
 
 const TuitionSchema = new mongoose.Schema({
   userEmail: String,
   tuitionCode: String,
-  location: String,
-  subLocation: String,
+  district: String,
+  area: String,
   medium: String,
-  category: String,
-  address: String,
+  group: String,
   tutoringDays: [String],
   salary: String,
   details: DetailsSchema
