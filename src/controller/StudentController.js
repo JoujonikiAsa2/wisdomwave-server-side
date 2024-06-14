@@ -18,8 +18,13 @@ exports.tuitionsByEmail = async (req, res) => {
 // all tutors api
 exports.tutors = async (req, res) => {
     try {
-        const result = await TutorProfileModel.find({}, '-__v');
-        res.status(200).json({ status: "success", data: result });
+        const page = parseInt(req.query.page)
+        const size = parseInt(req.query.size)
+        const skip = page * size; 
+        const result = await TutorProfileModel.find({}, '-__v').skip(skip).limit(size);
+        const count = await TutorProfileModel.countDocuments();
+        res.status(200).json({ status: "success", data: result, total: count });
+        // console.log(result, count)
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message });
     }

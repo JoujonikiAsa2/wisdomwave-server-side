@@ -1,5 +1,5 @@
 const AssignmentModel = require('../models/AssignmentSchema')
-exports.createAssaignment = async (req, res) => {
+exports.createQuiz = async (req, res) => {
     try {
         const quiz = req.body
         

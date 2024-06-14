@@ -92,6 +92,8 @@ exports.paymentSuccess = async (req, res) => {
         const purchase = {
             userEmail: req.query.email,
             courseTitle: course.courseDetails.title,
+            date: new Date().toLocaleDateString(),
+            courseDetails: { ...course.courseDetails },
             courseFee: course.courseDetails.enrollFee,
             transactionId: tran_Id,
             paidStatus: true,
@@ -109,7 +111,7 @@ exports.paymentSuccess = async (req, res) => {
         const updateStudent = await CourseModel.findOneAndUpdate({ _id: req.params.courseId }, {$inc: { totalStudents: students+ 1 }}, { new: true });
 
 
-        const isExist =  await PurchasedCourseModel.findOne({ 'userEmail': req.query.email });
+        const isExist =  await PurchasedCourseModel.findOne({ 'userEmail': req.query.courseId });
 
         if (isExist) {
             console.log("Already enrolled");
@@ -182,25 +184,18 @@ exports.payments = async (req, res) => {
     }
 }
 
-// count total earning by calculate courseDetails.price and search by courseDetails.instructorEmail
 
-// search by courseDetails.instructorEmail
-// aggregate method is used to perform complex query on the database
-// aggregate method will take array of pipeline operator and return the result of the pipeline
-// pipeline operator are used to specify the stage of the aggregation pipeline
-// in this case we are using $match and $group stage
-// $match will filter the document based on the condition
-// $group will group the document based on the _id and calculate the totalEarning
-
-exports.totalEarning = async (req, res) => {
+exports.totalEarningByInstructor = async (req, res) => {
     try {
         const email = req.params.email
+
         // search by courseDetails.instructorEmail
-        const result = await PurchasedCourseModel.aggregate([
+        const result = await PaymentModel.aggregate([
             // Match documents where enrollFee is not null
             {
               $match: {
-                "courseDetails.enrollFee": { $exists: true, $ne: null }
+                "courseDetails.enrollFee": { $exists: true, $ne: null },
+                "courseDetails.instructorEmail": email
               }
             },
             // Project only the necessary fields to optimize performance
@@ -214,7 +209,7 @@ exports.totalEarning = async (req, res) => {
             {
               $group: {
                 _id: null,
-                totalEnrollFee: { $sum: { $toDouble: "$enrollFee" } }
+                totalEnrollFee: {  $sum: { $toDouble: "$enrollFee" } }
               }
             }])
         res.status(200).json([... result] )
@@ -222,3 +217,101 @@ exports.totalEarning = async (req, res) => {
         res.status(500).json({ status: "fail", message: error.message })
     }
 }
+
+exports.platformEarningCalculation = async (req, res) => {
+    try {
+        const email = req.params.email
+        // search by courseDetails.instructorEmail
+        const result = await PaymentModel.aggregate([
+            // Match documents where enrollFee is not null
+            {
+              $match: {
+                "courseDetails.enrollFee": { $exists: true, $ne: null },
+              }
+            },
+            // Project only the necessary fields to optimize performance
+            {
+              $project: {
+                _id: 0,
+                enrollFee: "$courseDetails.enrollFee"
+              }
+            },
+            // total course fee
+            {
+              $group: {
+                _id: null,
+                totalEnrollFee: {  $sum: { $toDouble: "$enrollFee" } }
+              }
+            },
+            // 20% of each course fee
+            {
+                $addFields: {
+                    twentyPercentTotal: { $multiply: ["$totalEnrollFee", 0.20] }
+                }
+            }])
+        res.status(200).json([... result] ) 
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message })
+    }
+}
+
+exports.totalEarningByMonth = async (req, res) => {
+    try {
+        const result = await PaymentModel.aggregate([
+            {
+                $match: {
+                    "courseDetails.enrollFee": { $exists: true, $ne: null }
+                }
+            },
+            {
+                $project: {
+                    month: { $month: { $dateFromString: { dateString: "$date" } } },
+                    year: { $year: { $dateFromString: { dateString: "$date" } } },
+                    enrollFee: { $toDouble: "$courseDetails.enrollFee" }
+                }
+            },
+            {
+                $group: {
+                    _id: { month: "$month", year: "$year" },
+                    totalCourseFee: { $sum: "$enrollFee" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    name: {
+                        $switch: {
+                            branches: [
+                                { case: { $eq: ["$_id.month", 1] }, then: "Jan" },
+                                { case: { $eq: ["$_id.month", 2] }, then: "Feb" },
+                                { case: { $eq: ["$_id.month", 3] }, then: "Mar" },
+                                { case: { $eq: ["$_id.month", 4] }, then: "Apr" },
+                                { case: { $eq: ["$_id.month", 5] }, then: "May" },
+                                { case: { $eq: ["$_id.month", 6] }, then: "Jun" },
+                                { case: { $eq: ["$_id.month", 7] }, then: "Jul" },
+                                { case: { $eq: ["$_id.month", 8] }, then: "Aug" },
+                                { case: { $eq: ["$_id.month", 9] }, then: "Sep" },
+                                { case: { $eq: ["$_id.month", 10] }, then: "Oct" },
+                                { case: { $eq: ["$_id.month", 11] }, then: "Nov" },
+                                { case: { $eq: ["$_id.month", 12] }, then: "Dec" }
+                            ],
+                            default: "Unknown"
+                        }
+                    },
+                    year: "$_id.year",
+                    count: { $multiply: ["$totalCourseFee", 0.2] } // Calculating 20% of the total fee
+                }
+            },
+            {
+                $sort: { year: 1, month: 1 }
+            }
+        ]);
+
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+
+

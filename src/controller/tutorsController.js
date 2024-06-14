@@ -4,17 +4,134 @@ const TutorMessageModel = require("../models/TutorMessageSchema");
 const TutorProfileModel = require("../models/TutorProfileSchema");
 const nodemailer = require('nodemailer')
 
+// read profile 
+exports.tutorProfile = async (req, res) => {
+    try {
+        const email = req.params.userEmail
+        console.log(email)
+        const result = await TutorProfileModel.findOne({ 'email': email })
+        res.status(200).json({ status: "success", data: result })
+
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message })
+    }
+}
+
+// photo update a
+
+exports.updatePhoto = async (req, res) => {
+    try {
+        const email = req.params.userEmail;
+        const { profile } = req.body;
+        
+        console.log(`Updating photo for email: ${email}`);
+        console.log(`New profile photo: ${profile}`);
+
+        const result = await TutorProfileModel.findOneAndUpdate(
+            { email },
+            { profile },
+            { new: false }
+        );
+
+        if (!result) {
+            return res.status(404).json({ status: "fail", message: "Profile not found" });
+        }
+
+        res.status(200).json({ status: "success", data: result });
+    } catch (error) {
+        console.error(`Error updating photo: ${error.message}`);
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+exports.updateInfo = async (req, res) => {
+    try {
+        const email = req.params.userEmail;
+
+        const search = await TutorProfileModel.findOne({ email });
+
+        const bodyData = {
+            name: req.body.name,
+                age: req.body.age,
+                profile: search.profile,
+                currentStatus: req.body.currentStatus,
+                educationalQualication: {
+                    eduName: req.body.educationalQualication.eduName,
+                    subject: req.body.educationalQualication.subject,
+                    institute: req.body.educationalQualication.institute,
+                    cgpa: req.body.educationalQualication.cgpa,
+                },
+                medium: req.body.medium,
+                preferableLocation: req.body.preferableLocation,
+                subLocation: req.body.subLocation,
+                preferableClass: req.body.preferableClass,
+                preferableSubject: req.body.preferableSubject,
+                experience:req.body.experience,
+                expectedSalary: req.body.expectedSalary,
+                profileCreationDate: new Date(),
+                about: req.body.about,
+                tuitionType: req.body.tuitionType,
+                tuitionDays: req.body.tuitionDays,
+                email: req.body.email
+        }
+
+        console.log(bodyData)
+
+        const result = await TutorProfileModel.findOneAndUpdate(
+            { email },
+            bodyData,
+            { new: true }
+        );
+
+        if (!result) {
+            return res.status(404).json({ status: "fail", message: "Profile not found" });
+        }
+
+        res.status(200).json({ status: "success", data: result });
+    } catch (error) {
+        console.error(`Error updating info: ${error.message}`);
+        res.status(500).json({ status: "fail", message: error.message });
+    }
+};
+
+exports.deleteProfile = async (req, res) => {
+    try {
+        const email = req.params.userEmail
+        const result = await TutorProfileModel.deleteOne({ 'email': email })
+        res.status(200).json({ status: "success", data: result })
+    } catch (error) {
+        res.status(500).json({ status: "fail", message: error.message })
+    }
+}
+
+// // find tuition request send by the tutor
+// exports.tuitionsByTutorEmail = async (req, res) => {
+//     try {
+//         const email = req.params.tutorEmail
+//         const result = await TuitionModel.find({ 'tutorEmail': email })
+//         res.status(200).json({ status: "success", data: result })
+//     } catch (error) {
+//         res.status(500).json({ status: "fail", message: error.message });
+//     }
+// }
+
+// create profile
 exports.createProfile = async (req, res) => {
     try {
         const email = req.params.userEmail
         const tutorProfile = req.body
+        console.log(email)
+
         const isExist = await TutorProfileModel.findOne({ 'email': email })
         if (isExist) {
-            res.status(400).json({ status: "fail", message: "Tuition already exist" })
+            console.log({ message: "Tuition already exist" })
+            res.status(200).json({ status: "fail", message: "Tuition already exist" })
         }
         else {
+            console.log("created")
             const result = await TutorProfileModel.create(tutorProfile)
-        res.status(200).json({ status: "success", data: result })
+            console.log(result)
+            res.status(200).json({ status: "success", data: result })
         }
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message })
@@ -50,7 +167,7 @@ exports.requestedTuitionByTutorEmail = async (req, res) => {
     try {
         console.log("Hello")
         const email = req.params.tutorEmail
-        const filter = {tutorEmail: email}
+        const filter = { tutorEmail: email }
         const result = await TutorMessageModel.find(filter);
         res.status(200).send({ status: "success", data: result });
 
@@ -143,5 +260,5 @@ exports.getTuitionRequestFromTutor = async (req, res) => {
     }
 
 }
- 
+
 

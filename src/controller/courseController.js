@@ -23,7 +23,10 @@ exports.totalCourse = async (req, res) => {
 // read course
 exports.courses = async (req, res) => {
   try {
-    const result = await CourseModel.find();
+    const page = parseInt(req.query.page);
+    const size = parseInt(req.query.size);
+    const skip = page * size 
+    const result = await CourseModel.find().skip(skip).limit(size);
     res.status(200).json({ status: "success", data: result });
   } catch (error) {
     res.status(500).json({ status: "fail", message: error.message });
@@ -157,6 +160,7 @@ exports.updateCourse = async (req, res) => {
   try {
     const id = req.params.id;
     const update = req.body; 
+    console.log(update)
     const options = { new: false };
     const course = await CourseModel.findByIdAndUpdate(id, update, options); 
     console.log("course");

@@ -1,20 +1,21 @@
-const { payment, paymentSuccess, paymentFail, paymentCancel, home, totalEarning } = require('../controller/paymentController')
-const { tutorDetails, createProfile, tuitions, requestedTuitionByTutorEmail, messageStudent, getTuitionRequestFromTutor } = require('../controller/tutorsController')
+const { payment, paymentSuccess, paymentFail, paymentCancel, home, totalEarningByInstructor, platformEarningCalculation, transactions, totalEarningByMonth } = require('../controller/paymentController')
+const { tutorDetails, createProfile, tuitions, requestedTuitionByTutorEmail, messageStudent, getTuitionRequestFromTutor, tutorProfile, updatePhoto, updateInfo, deleteProfile } = require('../controller/tutorsController')
 const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, deleteCourse, findCourseByEmail, updateCourse, createCourse } = require('../controller/courseController')
 const { discussionPost, replyPost, discussionsRead, discussionReadById, deleteDiscussion } = require('../controller/discussionController')
 const { likes } = require('../controller/likesController')
 const { purchasedCourses } = require('../controller/purchasedCoursesController')
-const { createUser, readUser, readUserByEmail, updateUser } = require('../controller/userController')
+const { createUser, readUser, readUserByEmail, updateUser, deleteUser, updateUserType } = require('../controller/userController')
 const { createAnnouncement, deleteAnnouncement, announcements, StudentAnnouncements, readStatusUpdate, isReadStatus } = require('../controller/AnnouncementController')
 const { createLiveClass } = require('../controller/LiveClassController')
 const { enrolledStudents, totalStudents, coursebyId } = require('../controller/InstructorController')
 const { createTuitions, tuitionsByEmail, tutors, requestedTuition, messageTutor } = require('../controller/StudentController')
-const { createAssaignment, assignments } = require('../controller/AssignmentController')
+const { createQuiz, assignments } = require('../controller/AssignmentController')
 const { quizResponse, readQuiz } = require('../controller/QuizController')
 const { tuitionCreate } = require('../controller/TuitionController')
 const { readDistricts, readDistrictByName } = require('../controller/DistrictController')
 const { readUpazilasByDistrictId, readUpazilas } = require('../controller/UpazilaController')
 const { institutes, eduLevels, subjects } = require('../controller/EduBgController')
+const { deleteCourseAdmin, searchCourse, searchCourseAdmin, updateCourseByAdmin } = require('../controller/AdminController')
 
 const router = require('express').Router()
 
@@ -134,7 +135,7 @@ router.get('/announcements/email/:email', announcements)
 router.put('/liveClasses/id/:id', createLiveClass)
 
 // create assignmentTask
-router.post('/assignments', createAssaignment)
+router.post('/assignments', createQuiz)
 
 // read quiz response
 router.get('/quiz/:email/:patternTitle', readQuiz)
@@ -146,7 +147,7 @@ router.post('/quiz', quizResponse)
 router.get('/assignments/:id/:title', assignments)
 
 // live class link update api
-router.get('/totalEarning/:email', totalEarning)
+router.get('/totalEarningByInstructor/:email', totalEarningByInstructor)
 
 // enrolled students
 router.get('/enrolledStudents/instructor/:instructorEmail', enrolledStudents)
@@ -160,8 +161,20 @@ router.get('/totalStudents/instructor/email/:instructorEmail', totalStudents)
 // tutors
 //-----------------------------------------------------------------------------------
 
+// read profile data api
+router.get('/tutors/:userEmail', tutorProfile)
+
+// update profile photo api
+router.patch('/tutors/:userEmail', updatePhoto)
+
+// update profile info api
+router.patch('/tutors/info/:userEmail', updateInfo)
+
+// delete profile api
+router.delete('/tutors/:userEmail', deleteProfile)
+
 // create tutor api
-router.post('/tutors', createProfile)
+router.post('/tutors/:userEmail', createProfile)
 
 // allTuition request
 router.get('/requestedTuition/tutor/:tutorEmail', requestedTuitionByTutorEmail)
@@ -218,6 +231,12 @@ router.get('/users', readUser)
 // read student by email api
 router.get('/user/:email', readUserByEmail)
 
+// delete user
+router.delete('/user/:email', deleteUser)
+
+// update user type as admin
+router.patch('/user/:email', updateUserType)
+
 
 // others
 // -----------------------------------------------------------------------
@@ -242,5 +261,22 @@ router.get('/subjects', subjects)
 
 // get education levels
 router.get('/educationLevels', eduLevels)
+
+
+// admin
+// ------------------------------------------------------------------------
+
+// calculate total earning for platform
+router.get('/platformEarning', platformEarningCalculation)
+
+// calculate earning by month
+router.get('/earningByMonth', totalEarningByMonth)
+
+// delete course
+router.delete('/courses/id/:id', deleteCourseAdmin)
+
+// search course
+router.get('/courses/email/query/:email', searchCourseAdmin)
+
 
 module.exports = router

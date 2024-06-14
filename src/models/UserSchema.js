@@ -12,7 +12,8 @@ const UserSchema = new mongoose.Schema({
     phoneNumber: String,
     verified: Boolean,
     location: String,
-    age: String
+    age: String,
+    date: String
 });
 
 const UserModel = mongoose.model('users', UserSchema);
