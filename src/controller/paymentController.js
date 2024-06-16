@@ -2,7 +2,9 @@ const SSLCommerzPayment = require('sslcommerz-lts');
 const CourseModel = require('../models/CourseSchema');
 const mongoose = require('mongoose');
 const PaymentModel = require('../models/PaymentSchema');
-const PurchasedCourseModel = require('../models/PurchasedCourseSchema')
+const PurchasedCourseModel = require('../models/PurchasedCourseSchema');
+const { ObjectId } = mongoose.Types;
+
 
 const store_id = process.env.STORE_ID;
 const store_passwd = process.env.STORE_PASSWORD;
@@ -104,12 +106,18 @@ exports.paymentSuccess = async (req, res) => {
             courseId: req.params.courseId, // Fix here, should use req.params.id instead of req.params.courseId
             transactionId: tran_Id,
             paidStatus: true,
-            courseDetails: { ...course.courseDetails }
+            courseDetails: { ...course.courseDetails },
+            certificate: false
         };
 
         // update student count at student model database by comparing course id
-        const updateStudent = await CourseModel.findOneAndUpdate({ _id: req.params.courseId }, {$inc: { totalStudents: students+ 1 }}, { new: true });
-
+        const updateStudent = await CourseModel.findByIdAndUpdate(
+            course_Id,
+            { $inc: { 'courseDetails.totalStudents': 1 } },
+            { new: true } // Return the updated document
+        );
+        
+        console.log(updateStudent);
 
         const isExist =  await PurchasedCourseModel.findOne({ 'userEmail': req.query.courseId });
 
@@ -211,7 +219,13 @@ exports.totalEarningByInstructor = async (req, res) => {
                 _id: null,
                 totalEnrollFee: {  $sum: { $toDouble: "$enrollFee" } }
               }
-            }])
+            },
+            {
+                $addFields: {
+                    eightyTotal: { $multiply: ["$totalEnrollFee", 0.80] }
+                }
+            }
+        ])
         res.status(200).json([... result] )
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message })

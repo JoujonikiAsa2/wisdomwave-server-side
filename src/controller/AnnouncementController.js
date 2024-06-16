@@ -3,10 +3,11 @@ const AnnouncementModel = require("../models/AnnouncementSchema")
 // create announcement
 exports.createAnnouncement = async (req, res) => {
     try {
-        // console.log("Hittet")
+        console.log("Hittet at create announcement")
         const announcement = req.body
+        console.log(announcement)
         const result = await AnnouncementModel.create(announcement)
-        // console.log(result)
+        console.log(result)
         res.status(200).json({ status: "success", data: result })
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message })
@@ -70,6 +71,7 @@ exports.isReadStatus = async (req, res) => {
 
 exports.readStatusUpdate = async (req, res) => {
     try {
+        console.log("Hittet at readStatusUpdate")
         const email = req.params.email; // Trim to remove any leading or trailing white spaces
         
         // Update documents where studentEmails.email matches the specified email

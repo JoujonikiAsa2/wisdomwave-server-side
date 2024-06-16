@@ -1,9 +1,9 @@
 const { payment, paymentSuccess, paymentFail, paymentCancel, home, totalEarningByInstructor, platformEarningCalculation, transactions, totalEarningByMonth } = require('../controller/paymentController')
 const { tutorDetails, createProfile, tuitions, requestedTuitionByTutorEmail, messageStudent, getTuitionRequestFromTutor, tutorProfile, updatePhoto, updateInfo, deleteProfile } = require('../controller/tutorsController')
-const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, deleteCourse, findCourseByEmail, updateCourse, createCourse } = require('../controller/courseController')
-const { discussionPost, replyPost, discussionsRead, discussionReadById, deleteDiscussion } = require('../controller/discussionController')
+const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, deleteCourse, findCourseByEmail, updateCourse, createCourse, updateRating, averageRating, totalRatings } = require('../controller/courseController')
+const { discussionPost, replyPost, discussionsRead, discussionReadById, deleteDiscussion, discussionLikes, isLikedOnDiscussion } = require('../controller/discussionController')
 const { likes } = require('../controller/likesController')
-const { purchasedCourses } = require('../controller/purchasedCoursesController')
+const { purchasedCourses, openCerticates, closeCerticates } = require('../controller/purchasedCoursesController')
 const { createUser, readUser, readUserByEmail, updateUser, deleteUser, updateUserType } = require('../controller/userController')
 const { createAnnouncement, deleteAnnouncement, announcements, StudentAnnouncements, readStatusUpdate, isReadStatus } = require('../controller/AnnouncementController')
 const { createLiveClass } = require('../controller/LiveClassController')
@@ -15,7 +15,7 @@ const { tuitionCreate } = require('../controller/TuitionController')
 const { readDistricts, readDistrictByName } = require('../controller/DistrictController')
 const { readUpazilasByDistrictId, readUpazilas } = require('../controller/UpazilaController')
 const { institutes, eduLevels, subjects } = require('../controller/EduBgController')
-const { deleteCourseAdmin, searchCourse, searchCourseAdmin, updateCourseByAdmin } = require('../controller/AdminController')
+const { deleteCourseAdmin, searchCourse, searchCourseAdmin, updateCourseByAdmin, tuitionUpdate, tuitionDetails, tuitionRemove } = require('../controller/AdminController')
 
 const router = require('express').Router()
 
@@ -44,6 +44,15 @@ router.get('/searchedCategory/:category', searchedCategories)
 //searchedCourse by course title
 router.get('/search/key/:searchValue', searchCourses)
 
+// read ratings
+router.get('/ratings', totalRatings)
+
+// certificate
+router.patch('/certification/id/:id', openCerticates)
+
+// close certificate
+router.patch('/certification/close/id/:id', closeCerticates)
+
 
 
 // discussions
@@ -69,6 +78,12 @@ router.get('/discussions/likes/user', likes)
 // create tuition
 router.post('/tuitions', tuitionCreate)
 
+// likes count
+router.patch('/likes/:id', discussionLikes)
+
+// checking rout either a user liked or not
+router.get('/likes/:id/:email', isLikedOnDiscussion)
+
 
 
 // payment
@@ -91,9 +106,10 @@ router.get('/purchasedCourses/:email', purchasedCourses)
 //homepage
 router.get('/home', home)
 
+
+
 // instructor
 // -------------------------------------------------------------------------------------
-
 
 // Course api
 router.post('/courses', createCourse)
@@ -215,6 +231,11 @@ router.get('/requestedTuition/:email', requestedTuition)
 // read request from tutor api
 router.get('/student/tuitionRequest/:email', getTuitionRequestFromTutor)
 
+// update rating status
+router.patch('/student/rating/:courseId', updateRating)
+
+
+
 
 // user's api
 // ---------------------------------------------------------------------------
@@ -277,6 +298,15 @@ router.delete('/courses/id/:id', deleteCourseAdmin)
 
 // search course
 router.get('/courses/email/query/:email', searchCourseAdmin)
+
+// updateTuition details
+router.patch('/tuitions/:email', tuitionUpdate)
+
+// get tuition details
+router.post('/tuitions/:email', tuitionDetails)
+
+// delete tuition details
+router.delete('/tuitions/:tuitionCode', tuitionRemove)
 
 
 module.exports = router

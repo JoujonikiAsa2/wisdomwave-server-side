@@ -25,6 +25,7 @@ const PurchasedCourseSchema = new mongoose.Schema({
     paidStatus: Boolean,
     transactionId: String,
     liveClasses: [liveClassesSchema],
+    certificate: Boolean,
     courseDetails: {
         thumbnail: String,
         instructorEmail: String,
@@ -52,7 +53,7 @@ const PurchasedCourseSchema = new mongoose.Schema({
         category: String,
         classStart: Date,
         subtitle: String,
-        playlistId: String
+        playlistId: String,
     }
 });
 

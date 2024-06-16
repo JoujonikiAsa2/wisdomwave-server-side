@@ -1,5 +1,7 @@
 // Course
 const CourseModel = require("../models/CourseSchema");
+const PurchasedCourseModel = require("../models/PurchasedCourseSchema");
+const RatingModel = require("../models/RatingScema");
 
 // total category
 exports.totalCategory = async (req, res) => {
@@ -25,7 +27,7 @@ exports.courses = async (req, res) => {
   try {
     const page = parseInt(req.query.page);
     const size = parseInt(req.query.size);
-    const skip = page * size 
+    const skip = page * size
     const result = await CourseModel.find().skip(skip).limit(size);
     res.status(200).json({ status: "success", data: result });
   } catch (error) {
@@ -121,7 +123,7 @@ exports.createCourse = async (req, res) => {
     const courseInfo = req.body
     // console.log(courseInfo.courseDetails.title)
     const isExist = await CourseModel.findOne({ 'courseDetails.title': courseInfo.courseDetails.title, 'courseDetails.instructorEmail': courseInfo.courseDetails.instructorEmail });
-    
+
     if (isExist) {
       console.log("Course already exist")
       return res.status(404).json({ status: "Failed", message: "Course already exist" });
@@ -159,16 +161,52 @@ exports.deleteCourse = async (req, res) => {
 exports.updateCourse = async (req, res) => {
   try {
     const id = req.params.id;
-    const update = req.body; 
+    const update = req.body;
     console.log(update)
     const options = { new: false };
-    const course = await CourseModel.findByIdAndUpdate(id, update, options); 
+    const course = await CourseModel.findByIdAndUpdate(id, update, options);
     console.log("course");
-    res.status(200).json({ status: "success", data: course });
+    const purchasedCourse = await PurchasedCourseModel.findByIdAndUpdate({ courseId: id }, update, options);
+    console.log("course");
+    res.status(200).json({ status: "success", data: course, purchasedCourse: purchasedCourse });
   } catch (error) {
     res.status(500).json({ status: "Failed to update", message: error.message });
   }
 };
+
+// update rating when someone submit their rating
+exports.updateRating = async (req, res) => {
+  try {
+    const id = req.params.courseId;
+    const options = { new: true }; // Return the updated document
+    const isRatingExist = await RatingModel.findOne({ courseId: id, studentEmail: req.body.studentEmail });
+
+    console.log(isRatingExist)
+    if (!isRatingExist) {
+      const course = await CourseModel.findByIdAndUpdate(id, { $inc: { "courseDetails.rating": 1 } }, options);
+      const purchasedCourse = await PurchasedCourseModel.findOneAndUpdate({ courseId: id }, { $inc: { "courseDetails.rating": 1 } }, options);
+      const createRating = await RatingModel.create(req.body);
+      console.log(course.courseDetails.rating, purchasedCourse.courseDetails.rating)
+
+      return res.status(200).json({ status: "success", data: { course, purchasedCourse, ratings: createRating } });
+    } else {
+      return res.status(400).json({ status: "fail", message: "You already rated this course" });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: "failed", message: error.message });
+  }
+};
+
+// get all ratings
+exports.totalRatings = async (req, res) => {
+  try {
+    const result = await RatingModel.find();
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
+  }
+}
+
 
 
 
