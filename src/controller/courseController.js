@@ -207,6 +207,16 @@ exports.totalRatings = async (req, res) => {
   }
 }
 
+// get all reviews of a specific course
+exports.reviews = async (req, res) => {
+  try {
+    const result = await RatingModel.find({ courseId: req.params.courseId });
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    res.status(500).json({ status: "Failed to fetch", message: error.message });
+  }
+}
+
 
 
 

@@ -1,6 +1,6 @@
 const { payment, paymentSuccess, paymentFail, paymentCancel, home, totalEarningByInstructor, platformEarningCalculation, transactions, totalEarningByMonth } = require('../controller/paymentController')
 const { tutorDetails, createProfile, tuitions, requestedTuitionByTutorEmail, messageStudent, getTuitionRequestFromTutor, tutorProfile, updatePhoto, updateInfo, deleteProfile } = require('../controller/tutorsController')
-const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, deleteCourse, findCourseByEmail, updateCourse, createCourse, updateRating, averageRating, totalRatings } = require('../controller/courseController')
+const { courses, totalCourse, totalCategory, categories, courseDetails, searchedCategories, searchCourses, deleteCourse, findCourseByEmail, updateCourse, createCourse, updateRating, averageRating, totalRatings, reviews } = require('../controller/courseController')
 const { discussionPost, replyPost, discussionsRead, discussionReadById, deleteDiscussion, discussionLikes, isLikedOnDiscussion } = require('../controller/discussionController')
 const { likes } = require('../controller/likesController')
 const { purchasedCourses, openCerticates, closeCerticates } = require('../controller/purchasedCoursesController')
@@ -16,8 +16,18 @@ const { readDistricts, readDistrictByName } = require('../controller/DistrictCon
 const { readUpazilasByDistrictId, readUpazilas } = require('../controller/UpazilaController')
 const { institutes, eduLevels, subjects } = require('../controller/EduBgController')
 const { deleteCourseAdmin, searchCourse, searchCourseAdmin, updateCourseByAdmin, tuitionUpdate, tuitionDetails, tuitionRemove } = require('../controller/AdminController')
+const { signInToken } = require('../middlewares/signInToken')
+const { logOut } = require('../middlewares/logOut')
+const { logger } = require('../middlewares/logger')
+const { verifyAdmin } = require('../middlewares/verifyAdmin')
 
 const router = require('express').Router()
+
+// jwt
+router.post('/jwt', signInToken)
+
+// logout
+router.post('/logout', logOut)
 
 
 // courses
@@ -44,14 +54,14 @@ router.get('/searchedCategory/:category', searchedCategories)
 //searchedCourse by course title
 router.get('/search/key/:searchValue', searchCourses)
 
-// read ratings
-router.get('/ratings', totalRatings)
-
 // certificate
 router.patch('/certification/id/:id', openCerticates)
 
 // close certificate
 router.patch('/certification/close/id/:id', closeCerticates)
+
+// all reviews of a instructor
+router.get('/reviews/:courseId', reviews)
 
 
 
@@ -247,7 +257,7 @@ router.post('/users', createUser)
 router.put('/user/:email', updateUser)
 
 // read student api
-router.get('/users', readUser)
+router.get('/users',logger, verifyAdmin, readUser)
 
 // read student by email api
 router.get('/user/:email', readUserByEmail)

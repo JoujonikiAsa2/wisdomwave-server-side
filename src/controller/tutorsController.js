@@ -124,14 +124,14 @@ exports.createProfile = async (req, res) => {
 
         const isExist = await TutorProfileModel.findOne({ 'email': email })
         if (isExist) {
-            console.log({ message: "Tuition already exist" })
-            res.status(200).json({ status: "fail", message: "Tuition already exist" })
+            console.log({ message: "Profile already created" })
+            res.status(200).json({ status: "fail", message: "Profile already created" })
         }
         else {
             console.log("created")
             const result = await TutorProfileModel.create(tutorProfile)
             console.log(result)
-            res.status(200).json({ status: "success", data: result })
+            res.status(400).json({ status: "success", data: result })
         }
     } catch (error) {
         res.status(500).json({ status: "fail", message: error.message })
