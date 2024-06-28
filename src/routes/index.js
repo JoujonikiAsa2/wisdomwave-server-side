@@ -20,6 +20,7 @@ const { signInToken } = require('../middlewares/signInToken')
 const { logOut } = require('../middlewares/logOut')
 const { logger } = require('../middlewares/logger')
 const { verifyAdmin } = require('../middlewares/verifyAdmin')
+const { readFAQs, createFAQs, deleteFAQs } = require('../controller/FAQsController')
 
 const router = require('express').Router()
 
@@ -80,7 +81,7 @@ router.get('/discussions', discussionsRead)
 router.get('/discussions/:id', discussionReadById)
 
 // individual discussion by id
-router.delete('/discussions/:id/:email', deleteDiscussion)
+router.delete('/discussions/:id', deleteDiscussion)
 
 // individual discussion by id and update likes
 router.get('/discussions/likes/user', likes)
@@ -95,6 +96,18 @@ router.patch('/likes/:id', discussionLikes)
 router.get('/likes/:id/:email', isLikedOnDiscussion)
 
 
+
+// FAQ
+// -----------------------------------------------------------------------------------
+
+// read all faqs api
+router.get('/faqs', readFAQs)
+
+// create faq api
+router.post('/faqs', createFAQs)
+
+// delete faqs api
+router.delete('/faqs/:id', verifyAdmin, deleteFAQs)
 
 // payment
 //------------------------------------------------------------------------------------
