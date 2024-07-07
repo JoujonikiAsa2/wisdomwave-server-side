@@ -51,9 +51,9 @@ exports.categories = async (req, res) => {
 exports.searchedCategories = async (req, res) => {
   try {
     const category = req.params.category.toLowerCase()
-    // console.log(category)
+    console.log(category)
     const searchedCategories = await CourseModel.find({ 'courseDetails.category': category });
-    // console.log('Categories:', categories);
+    console.log('Categories:', searchedCategories);
     res.status(200).json({ status: "success", data: searchedCategories });
   } catch (error) {
     // console.error('Error finding', error);
@@ -162,13 +162,14 @@ exports.updateCourse = async (req, res) => {
   try {
     const id = req.params.id;
     const update = req.body;
-    console.log(update)
+    // console.log(update)
     const options = { new: false };
     const course = await CourseModel.findByIdAndUpdate(id, update, options);
-    console.log("course");
-    const purchasedCourse = await PurchasedCourseModel.findByIdAndUpdate({ courseId: id }, update, options);
-    console.log("course");
-    res.status(200).json({ status: "success", data: course, purchasedCourse: purchasedCourse });
+    // console.log("course");
+    console.log("update course");
+    const purchasedCourse = await PurchasedCourseModel.findOneAndUpdate({ courseId: id }, update, options);
+    console.log("update purchased course");
+    res.status(200).json({ status: "success", data: course, purchasedCourse: purchasedCourse});
   } catch (error) {
     res.status(500).json({ status: "Failed to update", message: error.message });
   }

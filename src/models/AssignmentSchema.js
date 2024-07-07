@@ -19,5 +19,5 @@ const assignmentSchema = new mongoose.Schema({
     questions: [quizQuestionPattern]
 })
 
-const AssignmentModel = mongoose.model('assignments', assignmentSchema);
+const AssignmentModel = mongoose.model('quizzes', assignmentSchema);
 module.exports = AssignmentModel

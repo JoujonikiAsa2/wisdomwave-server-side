@@ -147,7 +147,7 @@ exports.paymentCancel = async (req, res) => {
     try {
         const course_Id = req.params.courseId
         console.log(course_Id)
-        // res.status(200).send({ message: 'Payment canceled' });
+        res.status(200).send({ message: 'Payment canceled' });
         // res.redirect(`http://localhost:5173/payment/cancel/${course_Id}`)
         res.redirect(`https://wisdomwave-project.netlify.app/payment/cancel/${course_Id}`)
     } catch (error) {
@@ -160,7 +160,7 @@ exports.paymentFail = async (req, res) => {
     try {
         const course_Id = req.params.courseId
         console.log(course_Id)
-        // res.status(200).send({ message: 'Payment failed' });
+        res.status(200).send({ message: 'Payment failed' });
         // res.redirect(`http://localhost:5173/payment/fail/${course_Id}`)
         res.redirect(`https://wisdomwave-project.netlify.app/payment/fail/${course_Id}`)
     } catch (error) {
@@ -222,7 +222,7 @@ exports.totalEarningByInstructor = async (req, res) => {
             },
             {
                 $addFields: {
-                    eightyTotal: { $multiply: ["$totalEnrollFee", 0.80] }
+                    eightyTotal: { $multiply: ["$totalEnrollFee", 0.95] }
                 }
             }
         ])
@@ -260,7 +260,7 @@ exports.platformEarningCalculation = async (req, res) => {
             // 20% of each course fee
             {
                 $addFields: {
-                    twentyPercentTotal: { $multiply: ["$totalEnrollFee", 0.20] }
+                    twentyPercentTotal: { $multiply: ["$totalEnrollFee", 0.05] }
                 }
             }])
         res.status(200).json([... result] ) 

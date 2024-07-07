@@ -15,7 +15,7 @@ exports.signInToken = async (req, res, next) => {
           // httpOnly: true,
           secure: false,
         })
-        .send({ success: true })
+        .send({ success: true, user: user,  })
     } catch (error) {
       console.log(error);
       return res.send({ error: true, message: error.message });

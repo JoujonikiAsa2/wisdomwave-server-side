@@ -25,7 +25,7 @@ exports.createUser = async (req, res) => {
 }
 
 // update user api
-exports.updateUser = async (req, res) => {
+exports.updateUserStatus = async (req, res) => {
     try {
         const email = req.params.email;
         const filter = { email: email };

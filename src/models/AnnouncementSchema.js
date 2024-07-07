@@ -4,6 +4,7 @@ const AnnouncementSchema = new mongoose.Schema({
     title: String,
     details: String,
     email: String,
+    instructorName: String,
     studentEmails: [{email:String, isRead: Boolean}]
 })
 

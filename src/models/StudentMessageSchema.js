@@ -5,7 +5,6 @@ const StudentMessageSchema = new mongoose.Schema({
     name: String,
     phoneNumber: String,
     studentEmail: String,
-    tutionType: String,
     tutorEmail: String,
     message:String,
     responseStatus: String

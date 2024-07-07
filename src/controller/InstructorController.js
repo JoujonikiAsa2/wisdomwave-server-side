@@ -24,11 +24,12 @@ exports.totalStudents = async(req,res) =>{
     }
 }
 
-exports.coursebyId = async(req,res) =>{
+exports.purchasedById = async(req,res) =>{
     try {
         const id = req.params.id
+        console.log(id)
         const result = await PurchasedCourseModel.findOne({courseId: id})
-        // console.log("result",result)
+        console.log(result)
         res.status(200).json({ status: "success", data: result })
     } catch (error) {
         res.status(500).json({ status: "failed to fetch", data: error })

@@ -4,7 +4,7 @@ require("dotenv").config();
 // token middleware function
 
 
-exports.verifyAdmin = async (req, res, next) => {
+exports.VerifyStudent = async (req, res, next) => {
   const token = req.cookies?.token;
   console.log(req.body, 'token middleware');
   console.log('value of token in middlewares', token);
@@ -18,7 +18,7 @@ exports.verifyAdmin = async (req, res, next) => {
       if (err) {
         return res.status(403).send({ message: err });
       }
-      else if (decoded.userType === 'admin') {
+      else if (decoded.userType === 'student') {
         next();
       }
       else {

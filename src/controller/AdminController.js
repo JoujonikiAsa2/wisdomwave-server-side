@@ -11,7 +11,7 @@ exports.deleteCourseAdmin = async (req, res) => {
     }
 }
 
-exports.searchCourseAdmin = async (req, res) => {
+exports.searchCoursebyEmail = async (req, res) => {
     try {
         const query = req.params.email
         console.log(query)

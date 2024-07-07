@@ -37,3 +37,24 @@ exports.closeCerticates = async (req, res) => {
       res.status(500).json({ status: "Failed to update", message: error.message });
     }
   }
+
+
+  exports.searchPurchasedCourses = async (req, res) => {
+    try {
+      const searchValue = req.params.searchValue;
+      console.log(searchValue);
+      const splitedKeywords = searchValue.split(" ");
+  
+      // Construct an array of regex
+      const regexQueries = splitedKeywords.map(keyword => new RegExp(keyword, 'i'));
+  
+      // Search for courses where each keyword matches part of the title
+      const searchedCourses = await PurchasedCourseModel.find({
+        'courseDetails.title': { $in: regexQueries }
+      });
+  
+      res.status(200).json({ status: "success", data: searchedCourses });
+    } catch (error) {
+      res.status(500).json({ status: "Failed to fetch", message: error.message });
+    }
+  };

@@ -7,7 +7,7 @@ exports.tuitionCreate = async (req, res) => {
         const subjects = req.body.details.subjects;
 
         const totalDocs = await TuitionModel.countDocuments() + 1
-        const tuitionCode = `tuition0j${totalDocs}`
+        const tuitionCode = `tuition0${totalDocs}`
 
         const {userEmail, district, area, group, medium, tutoringDays, salary, details} = req.body
 

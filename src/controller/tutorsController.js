@@ -162,14 +162,15 @@ exports.tutorDetails = async (req, res) => {
 }
 
 
-// all requested tuitions
+// all requested tuitions by student
 exports.requestedTuitionByTutorEmail = async (req, res) => {
     try {
         console.log("Hello")
         const email = req.params.tutorEmail
         const filter = { tutorEmail: email }
         const result = await TutorMessageModel.find(filter);
-        res.status(200).send({ status: "success", data: result });
+        const count = await TutorMessageModel.countDocuments(filter);
+        res.status(200).send({ status: "success", data: result, count: count });
 
     } catch (error) {
         console.error("Error occurred:", error);
@@ -247,14 +248,29 @@ You got a tuition post response from <b>${name}</b>
     sendEmail();
 };
 
+exports.tuitionMessageFromTutor = async (req, res) => {
+
+    try {
+        const email = req.params.email  
+        const filter = { tutorEmail: email }
+        const result = await StudentMessageModel.find(filter);
+        const count = await StudentMessageModel.countDocuments(filter);
+        res.status(200).send({ status: "success", data: result, count: count });
+
+    } catch (error) {
+        res.status(500).send({ status: "fail", message: error.message });
+    }
+}
+
 // get tuition request from tuttion post
-exports.getTuitionRequestFromTutor = async (req, res) => {
+exports.getTuitionRequestFromStudent = async (req, res) => {
 
     try {
         const email = req.params.email
         const filter = { studentEmail: email }
         const result = await StudentMessageModel.find(filter);
-        res.status(200).send({ status: "success", data: result });
+        const count = await StudentMessageModel.countDocuments(filter);
+        res.status(200).send({ status: "success", data: result, count});
     } catch (error) {
         res.status(500).send({ status: "fail", message: error.message });
     }
