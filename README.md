@@ -1,6 +1,8 @@
 ## 1. WisdomWave ( An e-learning and tutor finding website)<br/>
 
 **Frontend Live link:** <a href="https://wisdomwave-project.netlify.app/">WisdomWave</a> :link:
+**Backend Live link:** <a href="https://wisdomwave-server-side.vercel.app">API</a> :link:
+
 ## Repository
 **Client Side:** <a href="https://github.com/JoujonikiAsa2/wisdomwave-client-side">Click Here</a> :link:
 
